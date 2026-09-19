@@ -1,0 +1,51 @@
+# Environments, model/download caches, build output
+.venv/
+venv/
+.cache/
+models/
+dist/
+build/
+*.egg-info/
+
+# Python and test output
+__pycache__/
+.pytest_cache/
+*.py[cod]
+.coverage
+htmlcov/
+*.log
+
+# Local credentials/configuration
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+
+# User/corpus audio and generated detailed evaluation artifacts
+tests/audio_samples/
+data/
+recordings/
+reports/*.json
+*.wav
+*.mp3
+*.m4a
+*.webm
+*.ogg
+*.flac
+*.mp4
+*.zip
+*.7z
+*.tar
+*.gz
+*.safetensors
+*.pt
+*.pth
+*.onnx
+
+# Local editors and operating system files
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+Desktop.ini

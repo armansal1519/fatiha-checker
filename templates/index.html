@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#193f36">
+  <title>هم‌خوان | تمرین سورهٔ حمد</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'%3E%3Crect width='40' height='40' rx='12' fill='%23193f36'/%3E%3Ctext x='20' y='28' text-anchor='middle' font-size='28' fill='%23e4c98d'%3Eح%3C/text%3E%3C/svg%3E">
+  <link rel="preload" href="{{ url_for('static', filename='fonts/Vazirmatn-Variable.woff2') }}" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="{{ url_for('static', filename='fonts/Amiri-Regular.ttf') }}" as="font" type="font/ttf" crossorigin>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  <script id="verse-data" type="application/json">{{ verses | tojson }}</script>
+  <script src="{{ url_for('static', filename='app.js') }}" defer></script>
+</head>
+<body class="precise-page" data-ready="{{ 'true' if ready else 'false' }}">
+  <a class="skip-link" href="#verse-text">رفتن به آیهٔ انتخاب‌شده</a>
+  <header class="site-header wrap">
+    <a class="brand" href="/live" aria-label="هم‌خوان، قرائت زنده"><span class="brand-symbol" aria-hidden="true">ح</span><span>هم‌خوان<small>همراهِ صدای شما</small></span></a>
+    <nav class="mode-switch" aria-label="حالت تمرین"><a href="/live"><span class="nav-live-dot" aria-hidden="true"></span>قرائت زنده</a><a href="/" aria-current="page">بررسی دقیق آیه</a></nav>
+    <div class="local-badge"><span class="status-dot {{ '' if ready else 'unready' }}"></span>{{ 'آمادهٔ همراهی' if ready else 'مدل آماده نیست' }}<span class="badge-divider"></span>نسخهٔ آزمایشی</div>
+  </header>
+  <main class="wrap">
+    <section class="intro">
+      <div class="eyebrow"><span></span> مکثی برای دقیق‌تر خواندن <span></span></div>
+      <h1>یک آیه. یک قدم آگاهانه‌تر.</h1>
+      <p>بخوانید، به صدایتان گوش کنید و اختلاف‌های احتمالیِ حروف و حرکات را ببینید.</p>
+    </section>
+    <div class="workspace">
+      <aside class="surah-panel" aria-label="انتخاب آیه">
+        <div class="surah-heading"><div><span class="small-label">سورهٔ ۱</span><h2>الفاتحة</h2></div><span class="surah-seal" aria-hidden="true">۷</span></div>
+        <div class="surah-meta">سورهٔ حمد <span>۷ آیه · روایت حفص</span></div>
+        <nav id="verse-nav">
+          {% for verse in verses %}
+          <button class="verse-button {{ 'selected' if loop.first else '' }}" data-ayah="{{ verse.ayah }}" aria-current="{{ 'true' if loop.first else 'false' }}">
+            <span class="verse-number">{{ '۰۱۲۳۴۵۶۷۸۹'[verse.ayah] }}</span><span class="verse-preview" lang="ar">{{ verse.text }}</span><span class="verse-arrow" aria-hidden="true">‹</span>
+          </button>
+          {% endfor %}
+        </nav>
+        <p class="aside-note"><span aria-hidden="true">✧</span> هر بار، فقط آیهٔ انتخاب‌شده را بخوانید و در پایان آن توقف کنید.</p>
+      </aside>
+      <section class="practice-panel" aria-label="تمرین قرائت">
+        <div class="reading-card">
+          <div class="reading-top"><span id="ayah-label">آیهٔ ۱ از ۷</span><span class="reading-label">بخوانید</span></div>
+          <div class="verse-ornament" aria-hidden="true">✧</div>
+          <div id="verse-text" class="arabic-verse" lang="ar" tabindex="-1">{{ verses[0].text }}</div>
+          <p class="reading-hint">با صدای طبیعی و در محیطی آرام بخوانید.</p>
+          <div id="progress-dots" class="progress-dots" aria-hidden="true">{% for verse in verses %}<span class="{{ 'active' if loop.first else '' }}"></span>{% endfor %}</div>
+        </div>
+        <div class="recording-card">
+          <div class="section-top"><h2>نوبتِ خواندن شماست</h2><span>حداکثر ۳۰ ثانیه</span></div>
+          {% if not ready %}<p class="alert" role="alert">مدل بارگذاری نشده است. پیام خطا را در پنجرهٔ اجرای برنامه بررسی و برنامه را دوباره اجرا کنید.</p>{% endif %}
+          <div class="recorder-zone">
+            <button id="record-button" class="record-button" aria-label="شروع ضبط" {{ 'disabled' if not ready else '' }}><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="8" y="2" width="8" height="13" rx="4" stroke="currentColor" stroke-width="1.6"/><path d="M5 10v2a7 7 0 0 0 14 0v-2M12 19v3m-4 0h8" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg></button>
+            <div><p id="record-label">برای شروع ضبط کلیک کنید</p><p id="record-detail" class="muted">اجازهٔ دسترسی به میکروفن را تأیید کنید.</p></div>
+            <span id="record-time" class="timer" dir="ltr">۰۰:۰۰</span>
+          </div>
+          <button id="cancel-mic" class="secondary-button" hidden>انصراف از درخواست میکروفن</button>
+          <div class="or-divider"><span>یا فایل صوتی خود را انتخاب کنید</span></div>
+          <label class="upload-zone" id="upload-zone" for="audio-file"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 16V3m-5 5 5-5 5 5M4 15v5a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg><span id="file-label">انتخاب فایل صوتی<small>WAV · MP3 · M4A · WebM · OGG — تا ۱۰ مگابایت</small></span><span class="file-plus" aria-hidden="true">+</span></label>
+          <input id="audio-file" type="file" accept=".wav,.mp3,.m4a,.mp4,.webm,.ogg,audio/*" {{ 'disabled' if not ready else '' }}>
+          <div id="audio-preview" class="audio-preview" hidden><span class="small-label">صدای شما</span><audio id="audio-player" controls preload="metadata"></audio></div>
+          <div id="message" class="alert" role="alert" hidden></div>
+          <button id="analyze-button" class="primary-button" disabled><span id="analyze-label">بررسی قرائت</span><span aria-hidden="true">←</span></button>
+          <p id="processing-hint" class="processing-hint" role="status" hidden>در حال شنیدن و بررسی صدا… پردازش روی این کامپیوتر ممکن است کمی طول بکشد.</p>
+          <p class="privacy-note"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="5" y="10" width="14" height="11" rx="2" stroke="currentColor" stroke-width="1.5"/><path d="M8 10V7a4 4 0 0 1 8 0v3" stroke="currentColor" stroke-width="1.5"/></svg>صدای شما فقط روی همین دستگاه بررسی می‌شود.</p>
+        </div>
+        <section id="result-panel" class="result-card" aria-live="polite" hidden>
+          <div class="section-top"><h2 id="result-title">نتیجهٔ بررسی</h2><span id="elapsed"></span></div>
+          <p id="result-message"></p><div id="result-errors"></div>
+          <div class="result-actions"><button id="retry-button" class="secondary-button">دوباره بخوان</button><button id="next-button" class="primary-button">آیهٔ بعد <span aria-hidden="true">←</span></button></div>
+        </section>
+      </section>
+    </div>
+    <div class="bottom-note"><span aria-hidden="true">✧</span><p>این ابزار برای تمرین حروف، حرکات و کلمات است. نتیجهٔ مدل ممکن است خطا داشته باشد؛ برای اطمینان از قرائت، با مدرس خود بررسی کنید.</p></div>
+  </main>
+  <footer class="wrap"><span>هم‌خوان <span class="footer-dot">·</span> هر بار، کمی آگاهانه‌تر</span><span>صدای شما در سرور ذخیره نمی‌شود.</span></footer>
+  <noscript>برای ضبط و بررسی صدا، جاوااسکریپت مرورگر را فعال کنید.</noscript>
+</body>
+</html>
