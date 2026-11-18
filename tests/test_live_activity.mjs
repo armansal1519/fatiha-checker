@@ -22,7 +22,7 @@ function harness() {
   vm.runInContext(`
     let ready=true,generation=1, phase='recording', audioActivity=null, inputWarning='',lowInputSince=null,lastInputPaint=-Infinity,lastStreamStatus='';
     let renderedOrder=[],renderedCommitted=0,keyboardNode=null,lastReviewNode=null,reviewedThrough=0;
-    let referenceFetch=0,connection=null,controller=null,capture=null,raf=null,chosenFile=null;
+    let referenceFetch=0,hasDisplayLocation=false,connection=null,controller=null,capture=null,raf=null,chosenFile=null;
     let selectedWord=null,selectedGap=null,lastReference=null,lastSummary=null,lastAnnouncedCount=0;
     const wordNodes=new Map(),gapNodes=new Map(),active=()=>['recording','file'].includes(phase);
     function setPhase(value){phase=value;}

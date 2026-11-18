@@ -167,6 +167,7 @@ class LiveSession:
         self.last_message = "چند کلمهٔ پیوسته بخوانید."
         self.last_busy = 0
         self.first_transcript_ms = self.first_feedback_ms = self.first_position_ms = None
+        self.first_text_location_ms = None
         self.inference_times = []
         self.max_retained_samples = 0
         self.peak_unanalyzed_samples = 0
@@ -321,6 +322,8 @@ class LiveSession:
         job[timing_key] = round(job.get(timing_key, 0) + stage_ms, 2)
         if result is None:
             return None
+        if self.first_text_location_ms is None and result.get('text_location', {}).get('status') == 'probable':
+            self.first_text_location_ms = round((monotonic()-self.started)*1000, 1)
         event = dict(type=kind if kind == "transcript" else "feedback", **result,
                      start_sample=job["start"], end_sample=job["end"],
                      timings={**stage["timings"], timing_key: stage_ms})
@@ -343,7 +346,8 @@ class LiveSession:
 
     def metrics(self):
         return dict(first_transcript_ms=self.first_transcript_ms, first_feedback_ms=self.first_feedback_ms,
-                    first_position_ms=self.first_position_ms, analyses=len(self.inference_times),
+                    first_position_ms=self.first_position_ms, first_text_location_ms=self.first_text_location_ms,
+                    analyses=len(self.inference_times),
                     inference_ms=[x.get("worker_ms", 0) for x in self.inference_times],
                     stage_timings=self.inference_times,
                     input_samples=self.input.input_samples, output_samples=self.ring.total,
@@ -362,7 +366,8 @@ class LiveSession:
         return dict(summary=self.tracker.summary(), reference=getattr(self.tracker, "current_reference", None),
                     status=self.last_status, received_samples=self.ring.total,
                     analyzed_samples=self.analyzed_samples, committed_samples=self.committed_samples,
-                    committed_count=getattr(self.tracker, "committed_count", 0), metrics=self.metrics())
+                    committed_count=getattr(self.tracker, "committed_count", 0), metrics=self.metrics(),
+                    **(self.tracker.location_fields() if hasattr(self.tracker, "location_fields") else {}))
 
 
 def parse_json(message):

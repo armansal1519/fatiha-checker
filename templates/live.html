@@ -60,7 +60,9 @@
       </aside>
       <div class="reading-column">
         <section class="surah-sheet transcript-sheet" id="surah-reading" aria-label="متن شنیده‌شده" tabindex="-1">
-          <div class="sheet-heading"><div class="sheet-title"><h2>آنچه خواندید</h2><p id="transcript-location">محل قرائت هنوز مشخص نشده است</p></div><span class="sheet-meta">کل قرآن<br><span>روایت حفص</span></span></div>
+          <div class="sheet-heading"><div class="sheet-title"><h2>آنچه خواندید</h2><p id="transcript-location" role="status" aria-atomic="true">محل قرائت هنوز مشخص نشده است</p></div><span class="sheet-meta">کل قرآن<br><span>روایت حفص</span></span></div>
+          <div id="location-choices" role="group" aria-label="انتخاب آیه از میان پیشنهادها" hidden></div>
+          <p id="location-next" role="status" hidden></p>
           <div class="sheet-toolbar"><p>انتهای متن موقت است و ممکن است اصلاح شود.</p><label class="auto-follow"><input id="auto-follow" type="checkbox" checked><span>همراه متن حرکت کن</span></label></div>
           <div id="transcript-empty" class="transcript-empty"><svg viewBox="0 0 48 48" fill="none" aria-hidden="true"><path d="M11 15h26M11 24h20M11 33h13" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg><h3>هنوز واژه‌ای شنیده نشده</h3><p>«شروع خواندن» را بزنید یا یک فایل صوتی انتخاب کنید.<br>متنِ رونویسی‌شده اینجا ظاهر می‌شود؛ انتهای نوشته موقت است.</p></div>
           <div id="heard-transcript" class="heard-transcript" lang="ar" dir="rtl" role="group" aria-label="کلمات رونویسی‌شده"></div>

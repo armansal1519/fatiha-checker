@@ -23,6 +23,21 @@ def valid_time(value):
     return isinstance(value, (int, float)) and not isinstance(value, bool) and isfinite(value)
 
 
+def display_location(text_location, acoustic_reference=None, *, manual_reference=None):
+    """Combine independent location evidence for display. Never used for pronunciation."""
+    if manual_reference:
+        return dict(status='manual', candidates=[manual_reference], total_candidates=1)
+    if text_location['status'] == 'ambiguous':
+        return text_location
+    if acoustic_reference and text_location['status'] == 'probable':
+        candidate = text_location['candidates'][0]
+        if (candidate['surah'], candidate['ayah']) != (acoustic_reference['surah'], acoustic_reference['ayah']):
+            return text_location
+    if acoustic_reference:
+        return dict(status='confirmed', candidates=[acoustic_reference], total_candidates=1)
+    return text_location
+
+
 def _consonant_change(expected, heard):
     """Single written consonant substitution, excluding spelling-only alif/hamza variants."""
     left,right=lexical(expected),lexical(heard)
@@ -113,10 +128,49 @@ class TranscriptTracker:
         self._protected_ids = set()
         self._word_origin = None
         self.current_reference = None
+        self._text_location = dict(status='none', candidates=[], total_candidates=0)
+        self._location_query = ''
+        self._acoustic_location = None
+        self._manual_location = None
         self._last_message = 'چند کلمهٔ پیوسته بخوانید تا محل قرائت روشن شود.'
         if start_surah is not None:
-            self.corpus.reference(start_surah, start_ayah)
+            self._manual_location = self._verse_label(start_surah, start_ayah)
             self._manual = (start_surah, start_ayah)
+
+    def _verse_label(self, surah, ayah):
+        ref = self.corpus.reference(surah, ayah)
+        return dict(surah=surah, ayah=ayah, text=ref.text,
+                    surah_name=self.corpus.surahs[surah-1].get('name', ''))
+
+    def _find_text_location(self):
+        if self._manual:
+            return
+        # Limit work to the recent utterance, including the merged overlap.
+        # A pause can separate two unrelated verses or ordinary speech.
+        recent = self.tokens[-16:]
+        for index in range(len(recent) - 1, 0, -1):
+            left, right = recent[index-1]['end_ms'], recent[index]['start_ms']
+            if valid_time(left) and valid_time(right) and right-left > 2500:
+                recent = recent[index:]
+                break
+        query = ' '.join(word['text'].strip() for word in recent)[-1024:]
+        if query != self._location_query:
+            self._location_query = query
+            self._acoustic_location = None
+            search = getattr(self.corpus, 'text_location', None)
+            if search:
+                self._text_location = search(query)
+
+    def location_fields(self):
+        if self._manual_location:
+            # An explicitly chosen start may subsequently progress to a different ayah.
+            if self._acoustic_location and self._acoustic_location != self._manual_location:
+                visible = display_location(self._text_location, self._acoustic_location)
+            else:
+                visible = display_location(self._text_location, manual_reference=self._manual_location)
+        else:
+            visible = display_location(self._text_location, self._acoustic_location)
+        return dict(text_location=self._text_location, display_location=visible)
 
     def summary(self):
         reviewed = sum(t['state'] in {'match', 'difference'} for t in self.tokens)
@@ -166,7 +220,7 @@ class TranscriptTracker:
         if previous==self.committed_count:
             return None
         return dict(replace_from=len(self.tokens),tokens=[],committed_count=self.committed_count,
-                    summary=self.summary())
+                    summary=self.summary(), **self.location_fields())
 
     def update_transcript(self, result, start_sample, end_sample, settled=False, *, defer_commit=False):
         self._preview_prefix_count=0
@@ -177,7 +231,7 @@ class TranscriptTracker:
             if settled:
                 self.committed_count=len(self.tokens)
             return dict(replace_from=len(self.tokens),tokens=[],committed_count=self.committed_count,
-                        summary=self.summary())
+                        summary=self.summary(), **self.location_fields())
         start_ms, end_ms = start_sample*1000/RATE, end_sample*1000/RATE
         revision=result.get('repeat_verified_from_ms')
         prefix = self.tokens[:self.committed_count]
@@ -245,6 +299,7 @@ class TranscriptTracker:
                 self._asr_seen[token['id']]=(count+1,end_sample)
             tail.append(token)
         self.tokens = prefix+tail
+        self._find_text_location()
         alive = {t['id'] for t in self.tokens}
         self._pending = {key:value for key,value in self._pending.items() if key in alive}
         self._word_pending = {key:value for key,value in self._word_pending.items() if key in alive}
@@ -261,7 +316,7 @@ class TranscriptTracker:
             self.committed_count=len(prefix)
             self.commit_preview(end_sample,settled)
         return dict(replace_from=replace_from, tokens=deepcopy(tail), committed_count=self.committed_count,
-                    summary=self.summary())
+                    summary=self.summary(), **self.location_fields())
 
     def _verse_step(self, surah, ayah, direction):
         count = self.corpus.surahs[surah-1]['ayah_count']
@@ -890,9 +945,13 @@ class TranscriptTracker:
                 metadata=deepcopy(metadata)
                 updates.append(metadata)
                 self._published[token['id']]=deepcopy(metadata)
+        fields = self.location_fields()
+        message = self._last_message
+        if status == 'listening' and fields['display_location']['status'] == 'probable':
+            message = 'آیه از روی متن پیدا شد. برای بررسی تلفظ، به خواندن ادامه دهید.'
         return dict(updates=updates,
                     gaps=deepcopy(list(self._gaps.values())),reference=deepcopy(self.current_reference),
-                    status=status,message=self._last_message,summary=self.summary())
+                    status=status,message=message,summary=self.summary(), **fields)
 
     def update_phonemes(self, prediction, start_sample, end_sample, settled=False):
         if prediction.get('audio_activity',{}).get('status') in {'no_speech','uncertain'}:
@@ -932,13 +991,16 @@ class TranscriptTracker:
             located=self._check_words(words,expected,start_sample,end_sample,settled,letters) or located
         if located and self._anchor is not None:
             self._last_anchor_ms=end_sample*1000/RATE
+            self._acoustic_location = self._verse_label(self._anchor['surah'], self._anchor['ayah'])
         record['resolved']=located
         return self._feedback('tracking' if located else 'listening')
 
     def select_reference(self, surah, ayah):
         if type(surah) is not int or type(ayah) is not int:
             raise ValueError('شمارهٔ سوره یا آیه معتبر نیست.')
-        self.corpus.reference(surah,ayah)
+        self._manual_location = self._verse_label(surah, ayah)
+        self._acoustic_location = None
+        self._text_location = dict(status='none', candidates=[], total_candidates=0)
         self._manual=(surah,ayah)
         self._anchor=None
         self._last_anchor_ms=None

@@ -14,6 +14,7 @@ let generation = 0, phase = 'idle', capture = null, connection = null, controlle
 let sessionReplay = null, replayURL = null, chosenFile = null, selectedWord = null, selectedGap = null, lastReference = null;
 let manualScrollIntent = 0, manualUntil = 0, autoScrollUntil = 0, raf = null, lastCanvasFrame = 0, lastSummary = null;
 let surahs = [], catalogueReady = false, referenceFetch = 0, lastAnnouncedCount = 0;
+let hasDisplayLocation = false;
 let audioActivity = null, inputWarning = '', lowInputSince = null, lastInputPaint = -Infinity, lastStreamStatus = '';
 const wordNodes = new Map(), gapNodes = new Map();
 let renderedOrder = [], renderedCommitted = 0, keyboardNode = null, lastReviewNode=null;
@@ -63,6 +64,10 @@ function referenceControls() {
   $('reference-auto').disabled = unavailable;
   $('start-surah').disabled = unavailable || auto; $('start-ayah').disabled = unavailable || auto;
   $('reference-apply').disabled = unavailable || auto;
+  for (const button of $('location-choices').children) {
+    button.setAttribute('aria-disabled', String(unavailable || button.dataset.current !== 'true'));
+    button.title = active() ? 'انتخاب برای همین قرائت' : 'انتخاب برای شروع تمرین بعدی';
+  }
 }
 function setPhase(next) {
   if (measureUI) { const changed = performance.now(), run = generation; requestAnimationFrame(()=>{ if (run === generation) controlPaints.push(performance.now()-changed); }); }
@@ -371,16 +376,76 @@ function follow() {
     last.scrollIntoView({block:'nearest',behavior:matchMedia('(prefers-reduced-motion: reduce)').matches ? 'instant' : 'smooth'});
   }
 }
-async function updateReference(reference) {
-  if (!reference?.surah || !reference?.ayah) return;
+function locationLabel(ref) {
+  const name = ref.surah_name || surahs.find(row=>row.surah === ref.surah)?.name;
+  return `${name || `سورهٔ ${fa(ref.surah)}`} · آیهٔ ${fa(ref.ayah)}`;
+}
+function paintLocationChoices(choices) {
+  const group = $('location-choices');
+  if (!choices.length && !group.childElementCount) return;
+  const existing = new Map([...group.children].map(button=>[button.dataset.verse,button]));
+  for (const ref of choices) {
+    const key = `${ref.surah}:${ref.ayah}`;
+    let button = existing.get(key);
+    if (!button) {
+      button = document.createElement('button');
+      button.type = 'button'; button.className = 'secondary-button'; button.dataset.verse = key;
+      button.addEventListener('click',()=>{
+        if (button.getAttribute('aria-disabled') === 'true') return;
+        $('reference-auto').checked = false; $('start-surah').value = String(ref.surah);
+        fillAyahs(ref.ayah); applyManualReference();
+      });
+      group.append(button);
+    }
+    existing.delete(key);
+    button.dataset.current = 'true';
+    const label = locationLabel(ref);
+    if (button.textContent !== label) button.textContent = label;
+  }
+  for (const button of existing.values()) {
+    // Keep a focused option in place until the reader tabs away.
+    if (document.activeElement === button) {
+      button.dataset.current = 'false';
+      button.onblur = ()=>{ if (button.dataset.current === 'false') button.remove(); group.hidden = !group.childElementCount; };
+    } else button.remove();
+  }
+  group.hidden = !group.childElementCount;
+  referenceControls();
+}
+async function updateReference(event) {
+  let location = event.display_location;
+  if (location) hasDisplayLocation = true;
+  else if (!hasDisplayLocation && event.reference) location = {status:'confirmed',candidates:[event.reference]};
+  else return;
+  const candidates = (location.candidates || []).filter(ref=>ref?.surah && ref?.ayah);
+  const ambiguous = location.status === 'ambiguous';
+  const labels = {manual:'انتخاب دستی',confirmed:'تطبیق آوایی',probable:'آیهٔ احتمالی از روی متن'};
+  const reference = labels[location.status] ? candidates[0] : null;
+  const label = reference ? `${labels[location.status]} · ${locationLabel(reference)}` : '';
+  const choices = ambiguous ? candidates.slice(0,3) : [];
+  const total = Math.max(location.total_candidates || 0,candidates.length);
+  let message = label || (transcript.tokens.length ? 'هنوز آیه‌ای برای این عبارت پیدا نشد.' : 'محل قرائت هنوز مشخص نشده است');
+  if (ambiguous) {
+    message = total > choices.length ? `برای این عبارت ${fa(total)} آیهٔ احتمالی پیدا شد. ${fa(choices.length)} پیشنهاد برای انتخاب` : 'چند آیه با این عبارت هم‌خوانی دارند. محل خواندن را انتخاب کنید.';
+  }
+  if ($('transcript-location').textContent !== message) $('transcript-location').textContent = message;
+  if ($('reference-location').textContent !== label) $('reference-location').textContent = label;
+  $('stage-position').dataset.active = String(Boolean(reference));
+  paintLocationChoices(choices);
+  if (!reference) {
+    if (lastReference) { referenceFetch++; lastReference = null; }
+    const hint = ambiguous ? 'این عبارت چند مرجع احتمالی دارد.' : 'پس از مشخص‌شدن محل قرائت، متن همان بخش اینجا نمایش داده می‌شود.';
+    if ($('reference-text').textContent !== hint) $('reference-text').textContent = hint;
+    return;
+  }
   const identity = `${reference.surah}:${reference.ayah}`;
-  const name = surahs.find(surah=>surah.surah === reference.surah)?.name;
-  const label = `${name || `سورهٔ ${fa(reference.surah)}`} · آیهٔ ${fa(reference.ayah)}`;
-  $('transcript-location').textContent = label; $('reference-location').textContent = label;
-  $('stage-position').dataset.active = 'true';
   if (lastReference === identity && !reference.text) return;
   lastReference = identity; const request = ++referenceFetch;
-  if (reference.text) { $('reference-text').textContent = reference.text; return; }
+  if (reference.text) {
+    if ($('reference-text').textContent !== reference.text) $('reference-text').textContent = reference.text;
+    return;
+  }
+  $('reference-text').textContent = 'در حال دریافت متن آیه…';
   try {
     const response = await fetch(`/api/quran/ayahs?surah=${reference.surah}&start=${reference.ayah}&limit=1`);
     if (!response.ok) throw new Error(); const data = await response.json();
@@ -394,6 +459,7 @@ function reset({preserveFile = false} = {}) {
   transcript.reset(); wordNodes.clear(); gapNodes.clear(); $('heard-transcript').replaceChildren();
   issueHistory.clear(); resetIssue();
   renderedOrder=[]; renderedCommitted=0; keyboardNode=null; lastReviewNode=null; reviewedThrough=0; selectedWord = selectedGap = lastReference = null; lastSummary = null; lastAnnouncedCount = 0;
+  hasDisplayLocation = false; $('location-choices').replaceChildren(); $('location-choices').hidden = true; $('location-next').hidden = true;
   resetAudioDiagnostics();
   clearReplay(); error(); $('session-summary').hidden = true; $('word-detail').dataset.open = 'false';
   for (const key of ['role','aria-modal','aria-labelledby']) $('word-detail').removeAttribute(key);
@@ -440,17 +506,21 @@ function accept(event, run = generation) {
       // The server sends a non-destructive delta when speech is absent; apply
       // it normally so final commitment and the client word indexes stay equal.
       transcript.applyTranscript(event); issueHistory.record(event); paint(event); summary(event.summary); follow();
+      void updateReference(event);
       streamStatus(audioActivity && audioActivity.status !== 'speech' ? 'در انتظار گفتار واضح‌تر…' : 'متن شنیده‌شده نوشته شد؛ بررسی تلفظ ادامه دارد.');
     } else if (event.type === 'feedback') {
       if (Number.isInteger(event.end_sample)) reviewedThrough=Math.max(reviewedThrough,event.end_sample/16000);
       transcript.applyFeedback(event); paint(event); summary(event.summary);
       if (event.updates?.some(word=>['match','difference'].includes(word.state))) $('stage-result').dataset.active = 'true';
-      void updateReference(event.reference); streamStatus(event.message || (event.status==='tracking' ? 'قرائت دنبال می‌شود؛ به خواندن ادامه دهید.' : 'برای یافتن محل قرائت، چند کلمهٔ پیوسته بخوانید.'));
-      if (event.status === 'ambiguous') $('reference-choice').open = true;
+      void updateReference(event);
+      const locationStatus = event.display_location?.status;
+      if (locationStatus === 'ambiguous') streamStatus('چند آیه به این عبارت می‌خورند. به خواندن ادامه دهید یا محل را از بالای متن انتخاب کنید.');
+      else if (locationStatus === 'probable') streamStatus('آیهٔ احتمالی بالای متن آمده است. بررسی تلفظ ادامه دارد.');
+      else streamStatus(event.message || (event.status==='tracking' ? 'قرائت دنبال می‌شود؛ به خواندن ادامه دهید.' : 'برای بررسی تلفظ، چند کلمهٔ پیوسته بخوانید.'));
     } else if (event.type === 'progress') streamStatus(event.message || 'در حال بررسی صدا…');
     else if (event.type === 'done') {
       if (event.updates) { transcript.applyFeedback(event); paint(event); }
-      summary(event.summary); void updateReference(event.reference);
+      summary(event.summary); void updateReference(event);
       if (active()) void finish(true);
     }
   } catch (problem) { fail(problem.message); }
@@ -551,12 +621,19 @@ async function loadCatalogue() {
 $('live-start').addEventListener('click',()=>void begin());
 $('live-stop').addEventListener('click',()=>void finish()); $('live-stop-mobile').addEventListener('click',()=>void finish());
 $('live-reset').addEventListener('click',()=>reset());
-$('reference-auto').addEventListener('change',()=>{ referenceControls(); if (active() && $('reference-auto').checked && manualReferenceApplied) { $('reference-auto').checked=false; referenceControls(); status('مرجع دستی این نوبت فعال است. برای تشخیص خودکار نوبت تازه‌ای آغاز کنید.'); } });
+$('reference-auto').addEventListener('change',()=>{ $('location-next').hidden = true; referenceControls(); if (active() && $('reference-auto').checked && manualReferenceApplied) { $('reference-auto').checked=false; referenceControls(); status('مرجع دستی این نوبت فعال است. برای تشخیص خودکار نوبت تازه‌ای آغاز کنید.'); } });
 $('start-surah').addEventListener('change',()=>fillAyahs());
-$('reference-apply').addEventListener('click',()=>{
+function applyManualReference() {
   if (active()) { try { connection.setReference(Number($('start-surah').value),Number($('start-ayah').value)); manualReferenceApplied=true; status('محل انتخاب‌شده برای مقایسه اعمال شد؛ نوشتهٔ صدای شما حفظ می‌شود.'); } catch (problem) { error(problem.message); } }
-  else status('محل شروع انتخاب شد؛ «شروع خواندن» را بزنید.');
-});
+  else {
+    const message = `${locationLabel({surah:Number($('start-surah').value),ayah:Number($('start-ayah').value)})} برای شروع تمرین بعدی انتخاب شد.`;
+    if (phase === 'review' || phase === 'error') {
+      $('location-next').textContent = message; $('location-next').hidden = false;
+    }
+    status(message);
+  }
+}
+$('reference-apply').addEventListener('click',applyManualReference);
 $('live-file').addEventListener('change',async event=>{
   const file = event.target.files[0]; if (!file) return;
   reset(); const run = generation; setPhase('connecting'); status('در حال آماده‌سازی فایل…');
