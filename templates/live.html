@@ -3,68 +3,94 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
-  <meta name="theme-color" content="#163f36">
-  <title>هم‌خوان | قرائت زندهٔ حمد</title>
+  <meta name="theme-color" content="#193f36">
+  <title>هم‌خوان | رونویسی زندهٔ قرآن</title>
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'%3E%3Crect width='40' height='40' rx='12' fill='%23163f36'/%3E%3Ctext x='20' y='28' text-anchor='middle' font-size='28' fill='%23e4c98d'%3Eح%3C/text%3E%3C/svg%3E">
   <link rel="preload" href="{{ url_for('static', filename='fonts/Vazirmatn-Variable.woff2') }}" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="{{ url_for('static', filename='fonts/Amiri-Regular.ttf') }}" as="font" type="font/ttf" crossorigin>
   <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
   <link rel="stylesheet" href="{{ url_for('static', filename='live.css') }}">
-  <script id="live-data" type="application/json">{{ words | tojson }}</script>
   <script type="module" src="{{ url_for('static', filename='live.js') }}"></script>
 </head>
 <body class="live-page" data-ready="{{ 'true' if ready else 'false' }}" data-phase="idle">
-  <a class="skip-link" href="#surah-reading">رفتن به متن سوره</a>
+  <a class="skip-link" href="#surah-reading">رفتن به متن خوانده‌شده</a>
   <header class="site-header wrap">
     <a class="brand" href="/live" aria-label="هم‌خوان، قرائت زنده"><span class="brand-symbol" aria-hidden="true">ح</span><span>هم‌خوان<small>همراهِ صدای شما</small></span></a>
     <nav class="mode-switch" aria-label="حالت تمرین"><a href="/live" aria-current="page"><span class="nav-live-dot" aria-hidden="true"></span>قرائت زنده</a><a href="/">بررسی دقیق آیه</a></nav>
-    <div class="local-badge"><span class="status-dot {{ '' if ready else 'unready' }}"></span>{{ 'آمادهٔ همراهی' if ready else 'مدل آماده نیست' }}<span class="badge-divider"></span>نسخهٔ آزمایشی</div>
+    <div class="local-badge" id="model-badge"><span class="status-dot {{ '' if ready else 'unready' }}"></span><span id="model-readiness">{{ 'مدل‌ها آماده‌اند' if ready else 'مدل‌ها آماده نیستند' }}</span><span class="badge-divider"></span>نسخهٔ آزمایشی</div>
   </header>
   <main class="wrap live-wrap">
     <section class="live-intro">
-      <div><p class="eyebrow">یک صدا، یک لحظهٔ توجه</p><h1>شما بخوانید. <span>هم‌خوان همراه شماست.</span></h1></div>
-      <p>با آرامش ادامه دهید؛<br>بازخورد، هم‌قدم با خواندن شما می‌رسد.</p>
+      <h1>شما بخوانید. <span>نوشتهٔ صدایتان را ببینید.</span></h1>
+      <p>از هر جای قرآن آغاز کنید.<br>کلمه‌های شنیده‌شده، همراه بازخورد ظاهر می‌شوند.</p>
     </section>
     <div class="live-layout">
       <aside class="live-side" aria-label="کنترل و بازخورد قرائت">
         <section class="live-controls">
           <div class="capture-top"><span class="capture-label"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M4 10v4m4-7v10m4-14v18m4-14v10m4-7v4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>صدای شما</span><span class="live-pill" id="live-pill">{{ 'آماده' if ready else 'آماده نیست' }}</span></div>
-          <div class="capture-state"><h2 id="live-state-title">لحظه‌ای برای خواندن</h2><p id="live-state-description">شروع کنید؛ ادامهٔ سوره را با هم دنبال می‌کنیم.</p></div>
+          <div class="capture-state"><h2 id="live-state-title">با صدای خودتان آغاز کنید</h2><p id="live-state-description">قرائت را با میکروفن شروع کنید یا فایل صوتی انتخاب کنید.</p></div>
           <div class="wave-frame"><canvas id="live-wave" width="560" height="128" aria-label="نمایش موج صدای دریافتی"></canvas><span id="live-wave-empty">صدای شما اینجا جان می‌گیرد</span><span class="wave-axis" aria-hidden="true"></span></div>
           <div class="live-stats"><span class="capture-privacy"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="6" y="10" width="12" height="10" rx="2" stroke="currentColor" stroke-width="1.6"/><path d="M9 10V7a3 3 0 0 1 6 0v3" stroke="currentColor" stroke-width="1.6"/></svg>فقط روی دستگاه شما</span><span id="live-time" dir="ltr">۰۰:۰۰</span></div>
-          <div class="start-choice"><label for="start-ayah">شروع از</label><select id="start-ayah" {{ 'disabled' if not ready else '' }}>{% for verse in verses %}<option value="{{ verse.ayah }}">آیهٔ {{ '۰۱۲۳۴۵۶۷۸۹'[verse.ayah] }} · {{ verse.words[0] }}</option>{% endfor %}</select></div>
           <button class="primary-button live-start" id="live-start" {{ 'disabled' if not ready else '' }}><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="8" y="3" width="8" height="12" rx="4" stroke="currentColor" stroke-width="1.7"/><path d="M5 11v1a7 7 0 0 0 14 0v-1m-7 8v3m-3 0h6" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg><span>شروع خواندن</span><span class="button-arrow" aria-hidden="true">←</span></button>
-          <div class="capture-actions"><button class="secondary-button" id="live-stop" disabled><span class="stop-square" aria-hidden="true"></span>پایان خواندن</button><button class="secondary-button" id="live-reset" aria-label="شروع دوبارهٔ تمرین"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M4 5v5h5M4.7 9A8 8 0 1 1 4 15" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>از نو</button></div>
-          <div class="live-stages" aria-label="مراحل بررسی"><span id="stage-voice" data-active="false"><i aria-hidden="true"></i>دریافت صدا</span><span id="stage-position" data-active="false"><i aria-hidden="true"></i>دنبال‌کردن</span><span id="stage-result" data-active="false"><i aria-hidden="true"></i>بازخورد</span></div>
-          <p id="live-status" role="status" aria-live="polite">{{ 'در پایان هر آیه کمی مکث کنید و ادامه دهید.' if ready else 'مدل آماده نیست؛ برنامه را دوباره راه‌اندازی کنید.' }}</p>
+          <div class="capture-actions"><button class="secondary-button" id="live-stop" disabled>پایان خواندن</button><button class="secondary-button" id="live-reset" aria-label="شروع دوبارهٔ تمرین"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M4 5v5h5M4.7 9A8 8 0 1 1 4 15" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>از نو</button></div>
+          <div class="live-stages" aria-label="مراحل بررسی"><span id="stage-voice" data-active="false"><i aria-hidden="true"></i>دریافت صدا</span><span id="stage-position" data-active="false"><i aria-hidden="true"></i>یافتن آیه</span><span id="stage-result" data-active="false"><i aria-hidden="true"></i>بازخورد</span></div>
+          <p id="live-status" role="status" aria-live="polite">{{ 'محل قرائت خودکار پیدا می‌شود. هر نوبت تا ۳۰ دقیقه است.' if ready else 'مدل‌ها آماده نیستند؛ نصب را کامل و برنامه را دوباره اجرا کنید.' }}</p>
           <p id="live-error" class="alert" role="alert" hidden></p>
+          <button class="secondary-button recovery-action" id="check-ready" hidden>بررسی دوبارهٔ اتصال</button>
         </section>
+        <details class="reference-choice" id="reference-choice">
+          <summary>انتخاب محل قرائت</summary>
+          <div class="reference-fields">
+            <label class="reference-auto"><input type="checkbox" id="reference-auto" checked>تشخیص خودکار</label>
+            <label for="start-surah">سوره</label><select id="start-surah" disabled aria-describedby="reference-help"><option>در حال دریافت سوره‌ها…</option></select>
+            <label for="start-ayah">آیهٔ شروع</label><select id="start-ayah" disabled><option value="1">۱</option></select>
+            <button class="secondary-button" id="reference-apply" disabled>اعمال محل انتخاب‌شده</button>
+            <p id="reference-help">اگر عبارت در چند آیه تکرار شده، محل خواندن را خودتان مشخص کنید. انتخاب مرجع، نوشتهٔ صدای شما را تغییر نمی‌دهد.</p>
+          </div>
+        </details>
         <section class="word-detail" id="word-detail" aria-label="توضیح کلمه" data-open="false">
-          <div class="detail-heading"><span class="small-label">با دقت بیشتر</span><button id="word-close" class="icon-button" aria-label="بستن توضیح کلمه">×</button></div>
-          <h2 id="word-title">هر کلمه، یک فرصتِ تمرین</h2>
-          <div id="word-explanation">کلمه‌ای را انتخاب کنید تا بازخورد آن را اینجا ببینید.</div>
-          <button id="word-retry" class="text-button" hidden>تمرین دوبارهٔ این آیه <span aria-hidden="true">←</span></button>
+          <div class="detail-heading"><button id="word-close" class="icon-button" aria-label="بستن توضیح کلمه">×</button></div>
+          <h2 id="word-title">کلمه‌ها را مرور کنید</h2>
+          <div id="word-explanation">کلمهٔ مشخص‌شده را انتخاب کنید تا توضیح آن را ببینید.</div>
+          <button id="issue-open" class="text-button issue-open" type="button" aria-controls="issue-panel" hidden>اینجا را اشتباه شنید</button>
+          <button id="segment-play" class="secondary-button segment-play" hidden>شنیدن همین بخش</button>
+          <button id="word-retry" class="text-button" hidden>تمرین دوبارهٔ این آیه</button>
         </section>
-        <details class="file-practice"><summary><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M14 3H6a1 1 0 0 0-1 1v16a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V8l-5-5Zm0 0v5h5M9 15v3m3-6v6m3-4v4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>با فایل صوتی تمرین می‌کنید؟<span aria-hidden="true">+</span></summary><div class="file-content"><p>فایل خود را انتخاب کنید، سپس همراه پخش صدا بازخورد را ببینید.</p><label class="live-file-label" for="live-file">انتخاب فایل صوتی <span aria-hidden="true">↑</span></label><input id="live-file" type="file" accept="audio/*,.wav,.mp3,.m4a,.webm,.ogg" {{ 'disabled' if not ready else '' }}><span id="file-name">تا ۱۰ مگابایت · حداکثر ۳ دقیقه</span><button id="file-play" class="secondary-button" disabled>پخش و بررسی <span aria-hidden="true">▷</span></button></div></details>
+        <details class="file-practice"><summary><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M14 3H6a1 1 0 0 0-1 1v16a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V8l-5-5Zm0 0v5h5M9 15v3m3-6v6m3-4v4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>با فایل صوتی تمرین می‌کنید؟<span aria-hidden="true">+</span></summary><div class="file-content"><p>فایل خود را انتخاب کنید؛ سپس همراه پخش، متن و بازخورد را ببینید.</p><label class="live-file-label" for="live-file">انتخاب فایل صوتی <span aria-hidden="true">↑</span></label><input id="live-file" type="file" accept="audio/*,.wav,.mp3,.m4a,.webm,.ogg" {{ 'disabled' if not ready else '' }}><span id="file-name">تا ۱۰۰ مگابایت · حداکثر ۳۰ دقیقه</span><button id="file-play" class="secondary-button" disabled>پخش و بررسی</button></div></details>
       </aside>
       <div class="reading-column">
-        <section class="surah-sheet" id="surah-reading" aria-label="متن کامل سورهٔ حمد" tabindex="-1">
-          <div class="sheet-heading"><div class="surah-emblem" aria-hidden="true"><svg viewBox="0 0 52 52" fill="none"><path d="m26 2 7 7h10v10l7 7-7 7v10H33l-7 7-7-7H9V33l-7-7 7-7V9h10l7-7Z" stroke="currentColor"/><path d="m26 9 17 17-17 17L9 26 26 9Z" stroke="currentColor" opacity=".35"/></svg><span>۱</span></div><div class="sheet-title"><span class="small-label">آغازِ یک همراهی</span><h2 lang="ar">سُورَةُ الْفَاتِحَةِ</h2></div><span class="sheet-meta">۷ آیه<br><span>روایت حفص</span></span></div>
-          <div class="sheet-toolbar"><p>با صدای طبیعی بخوانید و ادامه دهید.</p><label class="auto-follow"><input id="auto-follow" type="checkbox" checked><span>همراه متن حرکت کن</span></label></div>
-          <div class="verses-flow">
-            {% for verse in verses %}
-            <div class="live-ayah" data-ayah="{{ verse.ayah }}"><span class="ayah-medallion" aria-label="آیهٔ {{ verse.ayah }}">{{ '۰۱۲۳۴۵۶۷۸۹'[verse.ayah] }}</span><div class="live-words" lang="ar">{% for word in words if word.ayah == verse.ayah %}<button class="live-word" data-index="{{ word.index }}" aria-label="{{ word.word }}؛ هنوز بررسی نشده">{{ word.word }}</button>{% endfor %}</div><span class="ayah-active-mark" aria-hidden="true"></span></div>
-            {% endfor %}
-          </div>
-          <div class="sheet-foot"><div class="live-legend" aria-label="راهنمای بازخورد"><span class="legend-match">بدون اختلافِ تشخیص‌داده‌شده</span><span class="legend-difference">اختلاف احتمالی</span><span class="legend-pending">هنوز بررسی نشده</span></div><span class="sheet-foot-ornament" aria-hidden="true">✦</span></div>
+        <section class="surah-sheet transcript-sheet" id="surah-reading" aria-label="متن شنیده‌شده" tabindex="-1">
+          <div class="sheet-heading"><div class="sheet-title"><h2>آنچه خواندید</h2><p id="transcript-location">محل قرائت هنوز مشخص نشده است</p></div><span class="sheet-meta">کل قرآن<br><span>روایت حفص</span></span></div>
+          <div class="sheet-toolbar"><p>انتهای متن موقت است و ممکن است اصلاح شود.</p><label class="auto-follow"><input id="auto-follow" type="checkbox" checked><span>همراه متن حرکت کن</span></label></div>
+          <div id="transcript-empty" class="transcript-empty"><svg viewBox="0 0 48 48" fill="none" aria-hidden="true"><path d="M11 15h26M11 24h20M11 33h13" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg><h3>هنوز واژه‌ای شنیده نشده</h3><p>«شروع خواندن» را بزنید یا یک فایل صوتی انتخاب کنید.<br>متنِ رونویسی‌شده اینجا ظاهر می‌شود؛ انتهای نوشته موقت است.</p></div>
+          <div id="heard-transcript" class="heard-transcript" lang="ar" dir="rtl" role="group" aria-label="کلمات رونویسی‌شده"></div>
+          <p id="transcript-announcement" class="sr-only" role="status" aria-live="polite" aria-atomic="true"></p>
+          <nav id="difference-nav" class="difference-nav" aria-label="مرور اختلاف‌ها" hidden><span id="difference-count"></span><div><button type="button" id="difference-prev" class="secondary-button">اختلاف قبلی</button><button type="button" id="difference-next" class="secondary-button">اختلاف بعدی</button></div></nav>
+          <div class="sheet-foot"><div class="live-legend" aria-label="راهنمای بازخورد"><span class="legend-match">اختلافی پیدا نشد</span><span class="legend-difference">اختلاف احتمالی</span><span class="legend-pending">موقت یا نامشخص</span></div></div>
         </section>
-        <section id="session-summary" class="session-summary" hidden aria-label="خلاصهٔ خواندن"><div class="summary-heading"><span class="small-label" id="summary-scope">از آیهٔ ۱ تا پایان سوره</span><h2>خواندن شما، در یک نگاه</h2></div><div class="summary-metrics"><div><strong id="summary-reviewed">۰</strong><span>کلمهٔ بررسی‌شده</span></div><div><strong id="summary-differences">۰</strong><span>نیازمند مرور</span></div><div><strong id="summary-unreviewed">۰</strong><span>هنوز نامشخص</span></div></div></section>
-        <section id="replay-section" class="replay-section" hidden><div><h2>یک بار دیگر گوش کنید</h2><p>صدای همین نوبت، فقط در این صفحه.</p></div><audio id="replay-audio" preload="metadata" hidden></audio><div class="replay-player"><button id="replay-toggle" class="secondary-button" disabled>پخش صدای من</button><div class="replay-track"><label class="sr-only" for="replay-seek">موقعیت بازپخش صدای همین نوبت</label><input id="replay-seek" type="range" min="0" max="100" step="0.1" value="0" disabled dir="ltr"><span id="replay-position" dir="ltr">۰۰:۰۰ / ۰۰:۰۰</span></div></div></section>
-        <p class="live-note">بازخورد به‌تدریج کامل می‌شود و ممکن است اصلاح شود. خط سبز، تأیید قطعی صحت قرائت نیست.</p>
+        <details id="reference-panel" class="reference-panel"><summary>متن مرجع برای مقایسه <span id="reference-location"></span></summary><div id="reference-text" lang="ar">پس از مشخص‌شدن محل قرائت، متن همان بخش اینجا نمایش داده می‌شود.</div><p>این بخش متن صحیح آیه است؛ رونویسی صدای شما در بالای صفحه قرار دارد.</p></details>
+        <section id="session-summary" class="session-summary" hidden aria-label="خلاصهٔ خواندن"><div class="summary-heading"><h2>مرور همین نوبت</h2><p id="summary-scope">فقط بخش‌هایی که خوانده‌اید</p></div><button id="review-first" class="text-button" hidden>مرور اختلاف‌ها</button><div class="summary-metrics"><div><strong id="summary-reviewed">۰</strong><span>کلمهٔ بررسی‌شده</span></div><div><strong id="summary-differences">۰</strong><span>نیازمند مرور</span></div><div><strong id="summary-unreviewed">۰</strong><span>نامشخص</span></div><div><strong id="summary-missing">۰</strong><span>بخش جاافتاده</span></div></div></section>
+        <section id="replay-section" class="replay-section" hidden><div><h2>یک بار دیگر گوش کنید</h2><p id="replay-note">صدای همین نوبت، فقط در این صفحه.</p></div><audio id="replay-audio" preload="metadata" hidden></audio><div class="replay-player"><button id="replay-toggle" class="secondary-button" disabled>پخش صدای من</button><div class="replay-track"><label class="sr-only" for="replay-seek">موقعیت بازپخش صدای همین نوبت</label><input id="replay-seek" type="range" min="0" max="100" step="0.1" value="0" disabled dir="ltr"><span id="replay-position" dir="ltr">۰۰:۰۰ / ۰۰:۰۰</span></div></div></section>
+        <button id="issue-at-time" class="text-button issue-open" type="button" aria-controls="issue-panel" hidden>ثبت خطا در زمانِ بازپخش</button>
+        <section id="issue-panel" class="issue-panel" aria-labelledby="issue-title" hidden>
+          <h2 id="issue-title" tabindex="-1">ثبت نمونهٔ شنیدن اشتباه</h2>
+          <p id="issue-location"></p>
+          <label for="issue-note">چه خواندید؟ <small>(اختیاری)</small></label>
+          <textarea id="issue-note" rows="2" maxlength="500" dir="auto"></textarea>
+          <p id="issue-privacy">فایل شامل حداکثر ۸ ثانیه از صدای شما، متن‌های دیده‌شده در همان بازه و یادداشت شماست. فایل روی دستگاهتان ذخیره می‌شود.</p>
+          <div class="issue-actions">
+            <button type="button" class="secondary-button" id="issue-save" aria-describedby="issue-privacy">دانلود نمونه برای بررسی</button>
+            <button type="button" class="text-button" id="issue-listen" hidden>شنیدن صدای نمونه</button>
+            <button type="button" class="text-button" id="issue-close">بستن</button>
+          </div>
+          <p id="issue-status" role="status"></p>
+          <a id="issue-viewer" href="/static/issue-review.html" target="_blank" rel="noopener" hidden>باز کردن ابزار مرور نمونه در زبانهٔ تازه</a>
+        </section>
+        <p class="live-note">رونویسی و تشخیص اختلاف ممکن است خطا داشته باشند. متن قرآن جایگزین کلمات شنیده‌شده نمی‌شود و رنگ سبز تأیید قطعی صحت قرائت نیست.</p>
       </div>
     </div>
   </main>
-  <footer class="wrap"><span>هم‌خوان <span class="footer-dot">·</span> هر بار، کمی آگاهانه‌تر</span><span>صدای شما در سرور ذخیره نمی‌شود.</span></footer>
+  <footer class="wrap"><span>هم‌خوان · همراه تمرین قرائت</span><span>صدا در سرور ذخیره نمی‌شود.</span></footer>
   <button id="live-stop-mobile" class="primary-button" hidden>پایان خواندن</button>
   <noscript>برای ضبط و بررسی صدا، جاوااسکریپت مرورگر را فعال کنید.</noscript>
 </body>

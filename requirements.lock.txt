@@ -1,4 +1,4 @@
-# Windows / Python 3.14.2. Includes the small development test runner.
+# Python 3.14, 64-bit. Includes the development test runner.
 annotated-types==0.8.0
 attrs==26.1.0
 av==18.1.0
@@ -14,6 +14,7 @@ Flask-Sock==0.7.0
 fsspec==2026.7.0
 fuzzysearch==0.8.1
 huggingface_hub==0.36.2
+hf-xet==1.8.0; platform_machine == "x86_64" or platform_machine == "amd64" or platform_machine == "arm64" or platform_machine == "aarch64"
 h11==0.16.0
 idna==3.20
 iniconfig==2.3.0

@@ -1,5 +1,7 @@
 """Installer failure boundaries; no real installs, models, or network requests."""
 import json
+from io import BytesIO
+from hashlib import sha256
 from pathlib import Path
 import subprocess
 from types import SimpleNamespace
@@ -250,7 +252,8 @@ def test_empty_cached_file_is_forced_to_download_without_replacing_healthy_files
 
     monkeypatch.setattr(huggingface_hub, "hf_hub_download", repair)
     assert model_assets.ensure_model() == str(model_cache)
-    assert repairs == [(model_assets.MODEL_ID, dict(filename="vocab.json", revision=model_assets.MODEL_REVISION, force_download=True))]
+    assert repairs == [(model_assets.MODEL_ID, dict(filename="vocab.json", revision=model_assets.MODEL_REVISION,
+        force_download=True, cache_dir=model_assets.hub_cache_directory()))]
     assert (model_cache / "model.safetensors").read_bytes() == b"test asset"
 
 
@@ -259,3 +262,193 @@ def test_configured_external_cache_is_respected(monkeypatch, tmp_path):
     monkeypatch.setenv("HF_HOME", custom_cache)
     model_assets.configure_cache()
     assert model_assets.os.environ["HF_HOME"] == custom_cache
+
+
+@pytest.fixture
+def transcription_cache(monkeypatch, model_cache):
+    contents = {"config.json":b'{"test":true}', "model.safetensors":b"healthy pinned weights"}
+    monkeypatch.setattr(model_assets, "TRANSCRIPTION_MANIFEST", {
+        name:(len(data),sha256(data).hexdigest()) for name,data in contents.items()})
+    monkeypatch.setattr(model_assets, "TRANSCRIPTION_FILES", tuple(contents))
+    for name,data in contents.items():
+        (model_cache/name).write_bytes(data)
+    return model_cache, contents
+
+
+def test_transcription_cached_assets_verify_full_hash_without_network(monkeypatch, transcription_cache):
+    snapshot, _ = transcription_cache
+    def local(repo, **kwargs):
+        assert repo == model_assets.TRANSCRIPTION_MODEL_ID
+        assert kwargs == dict(revision=model_assets.TRANSCRIPTION_MODEL_REVISION, local_files_only=True,
+                              cache_dir=model_assets.hub_cache_directory())
+        return str(snapshot)
+    monkeypatch.setattr(huggingface_hub, "snapshot_download", local)
+    monkeypatch.setattr(huggingface_hub, "hf_hub_download", forbid)
+    assert model_assets.ensure_transcription_model(offline=True) == str(snapshot)
+
+
+def test_same_size_corrupt_transcription_weight_is_rejected_offline(monkeypatch, transcription_cache):
+    snapshot, contents = transcription_cache
+    (snapshot/"model.safetensors").write_bytes(b"x"*len(contents["model.safetensors"]))
+    def local(*args, **kwargs):
+        assert kwargs.get("local_files_only") is True
+        return str(snapshot)
+    monkeypatch.setattr(huggingface_hub, "snapshot_download", local)
+    monkeypatch.setattr(huggingface_hub, "hf_hub_download", forbid)
+    with pytest.raises(RuntimeError, match="failed integrity"):
+        model_assets.ensure_transcription_model(offline=True)
+
+
+def test_corrupt_asr_metadata_repairs_only_that_file_at_pinned_revision(monkeypatch, transcription_cache):
+    snapshot, contents = transcription_cache
+    (snapshot/"config.json").write_bytes(b"bad")
+    repaired = []
+    monkeypatch.setattr(huggingface_hub, "snapshot_download", lambda *args,**kwargs:str(snapshot))
+    def repair(repo, **kwargs):
+        repaired.append((repo,kwargs))
+        (snapshot/kwargs["filename"]).write_bytes(contents[kwargs["filename"]])
+    monkeypatch.setattr(huggingface_hub, "hf_hub_download", repair)
+    assert model_assets.ensure_transcription_model() == str(snapshot)
+    assert repaired == [(model_assets.TRANSCRIPTION_MODEL_ID, {
+        "filename":"config.json", "revision":model_assets.TRANSCRIPTION_MODEL_REVISION,
+        "force_download":True, "cache_dir":model_assets.hub_cache_directory()})]
+    assert (snapshot/"model.safetensors").read_bytes() == contents["model.safetensors"]
+
+
+def test_missing_asr_file_uses_normal_resumable_download(monkeypatch, transcription_cache):
+    snapshot, contents = transcription_cache
+    (snapshot/"model.safetensors").unlink()
+    calls = []
+    def snapshot_download(repo, **kwargs):
+        calls.append(kwargs)
+        if not kwargs.get("local_files_only"):
+            (snapshot/"model.safetensors").write_bytes(contents["model.safetensors"])
+        return str(snapshot)
+    monkeypatch.setattr(huggingface_hub, "snapshot_download", snapshot_download)
+    monkeypatch.setattr(huggingface_hub, "hf_hub_download", forbid)
+    assert model_assets.ensure_transcription_model() == str(snapshot)
+    assert len(calls) == 2 and calls[1]["allow_patterns"] == list(contents)
+
+
+def test_setup_offline_prepares_speech_and_activity_models_in_same_checked_stage(monkeypatch):
+    monkeypatch.setattr(installer, "prepare_environment", lambda **kwargs:Path("test-python"))
+    monkeypatch.setattr(installer, "install_dependencies", lambda *args,**kwargs:None)
+    monkeypatch.setattr(installer, "verify_runtime", lambda *args:None)
+    calls = []
+    monkeypatch.setattr(installer, "run", lambda command,**kwargs:calls.append(command))
+    assert installer.main(["--offline"]) == 0
+    assert len(calls) == 1
+    assert "ensure_model(offline=True)" in calls[0][2]
+    assert "ensure_transcription_model(offline=True)" in calls[0][2]
+    assert "ensure_activity_model(offline=True)" in calls[0][2]
+
+
+@pytest.fixture
+def activity_cache(monkeypatch, tmp_path):
+    contents=b"pinned activity model bytes"
+    monkeypatch.setattr(model_assets,"BASE",tmp_path)
+    monkeypatch.setattr(model_assets,"ACTIVITY_MODEL_SIZE",len(contents))
+    monkeypatch.setattr(model_assets,"ACTIVITY_MODEL_SHA256",sha256(contents).hexdigest())
+    monkeypatch.delenv("HF_HUB_OFFLINE",raising=False)
+    path=tmp_path/".cache"/"models"/"silero-vad"/model_assets.ACTIVITY_MODEL_REVISION/"silero_vad.jit"
+    return path,contents
+
+
+def activity_response(contents, *, status=200, headers=None):
+    response=BytesIO(contents)
+    response.status=status
+    response.headers=headers or {}
+    return response
+
+
+def test_activity_cached_model_is_verified_without_network(monkeypatch,activity_cache):
+    path,contents=activity_cache
+    path.parent.mkdir(parents=True)
+    path.write_bytes(contents)
+    monkeypatch.setattr(model_assets,"urlopen",forbid)
+    assert model_assets.ensure_activity_model(offline=True)==path
+
+
+@pytest.mark.parametrize("state",["missing","same_size_corrupt"])
+@pytest.mark.parametrize("environment_offline",[False,True])
+def test_activity_offline_rejects_missing_or_corrupt_without_download(monkeypatch,activity_cache,state,environment_offline):
+    path,contents=activity_cache
+    if state=="same_size_corrupt":
+        path.parent.mkdir(parents=True)
+        path.write_bytes(b"x"*len(contents))
+    if environment_offline:monkeypatch.setenv("HF_HUB_OFFLINE","1")
+    monkeypatch.setattr(model_assets,"urlopen",forbid)
+    with pytest.raises(RuntimeError,match="failed integrity"):
+        model_assets.ensure_activity_model(offline=not environment_offline)
+    if state=="missing":assert not path.parent.exists()
+
+
+def test_activity_first_download_is_pinned_verified_and_atomically_published(monkeypatch,activity_cache):
+    path,contents=activity_cache
+    def download(request,**kwargs):
+        assert model_assets.ACTIVITY_MODEL_REVISION in request.full_url
+        assert request.get_header("Range") is None
+        assert request.get_header("Accept-encoding")=="identity"
+        return activity_response(contents,headers={"Content-Length":str(len(contents))})
+    monkeypatch.setattr(model_assets,"urlopen",download)
+    assert model_assets.ensure_activity_model()==path
+    assert path.read_bytes()==contents and not path.with_suffix(".jit.incomplete").exists()
+
+
+def test_activity_valid_range_resumes_partial_bytes(monkeypatch,activity_cache):
+    path,contents=activity_cache
+    path.parent.mkdir(parents=True)
+    prefix=7
+    partial=path.with_suffix(".jit.incomplete");partial.write_bytes(contents[:prefix])
+    def download(request,**kwargs):
+        assert request.get_header("Range")==f"bytes={prefix}-"
+        return activity_response(contents[prefix:],status=206,headers={
+            "Content-Range":f"bytes {prefix}-{len(contents)-1}/{len(contents)}",
+            "Content-Length":str(len(contents)-prefix)})
+    monkeypatch.setattr(model_assets,"urlopen",download)
+    assert model_assets.ensure_activity_model().read_bytes()==contents
+
+
+def test_activity_ignored_range_restarts_without_duplicating_prefix(monkeypatch,activity_cache):
+    path,contents=activity_cache
+    path.parent.mkdir(parents=True)
+    path.with_suffix(".jit.incomplete").write_bytes(contents[:7])
+    monkeypatch.setattr(model_assets,"urlopen",lambda *a,**k:activity_response(contents))
+    assert model_assets.ensure_activity_model().read_bytes()==contents
+
+
+@pytest.mark.parametrize("status,headers",[
+    (206,{"Content-Range":"bytes 0-3/4"}),
+    (206,{}),
+    (200,{"Content-Range":"bytes 7-25/26"}),
+    (200,{"Content-Length":"3"}),
+    (200,{"Content-Encoding":"gzip"}),
+])
+def test_activity_invalid_response_never_appends_to_partial(monkeypatch,activity_cache,status,headers):
+    path,contents=activity_cache
+    path.parent.mkdir(parents=True)
+    partial=path.with_suffix(".jit.incomplete");partial.write_bytes(contents[:7])
+    monkeypatch.setattr(model_assets,"urlopen",lambda *a,**k:activity_response(contents,status=status,headers=headers))
+    with pytest.raises(RuntimeError,match="download"):
+        model_assets.ensure_activity_model()
+    assert partial.read_bytes()==contents[:7] and not path.exists()
+
+
+def test_activity_truncated_download_preserves_bytes_for_resume(monkeypatch,activity_cache):
+    path,contents=activity_cache
+    monkeypatch.setattr(model_assets,"urlopen",lambda *a,**k:activity_response(contents[:7]))
+    with pytest.raises(RuntimeError,match="incomplete"):
+        model_assets.ensure_activity_model()
+    assert path.with_suffix(".jit.incomplete").read_bytes()==contents[:7]
+    assert not path.exists()
+
+
+def test_activity_bad_digest_never_replaces_existing_cache(monkeypatch,activity_cache):
+    path,contents=activity_cache
+    path.parent.mkdir(parents=True)
+    path.write_bytes(b"old bad file")
+    monkeypatch.setattr(model_assets,"urlopen",lambda *a,**k:activity_response(b"x"*len(contents)))
+    with pytest.raises(RuntimeError,match="integrity verification failed"):
+        model_assets.ensure_activity_model()
+    assert path.read_bytes()==b"old bad file"
+    assert not path.with_suffix(".jit.incomplete").exists()

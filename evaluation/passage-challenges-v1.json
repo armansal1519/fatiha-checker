@@ -1,0 +1,9 @@
+{
+ "version": 1,
+ "selection": "Chosen without consulting any holdout results. Two supplemental diagnostics, excluded from the frozen 320-clip criteria.",
+ "reader": {"id": 1, "name": "إبراهيم الأخضر", "riwayah": "حفص عن عاصم", "folder_url": "https://cdn.mp3quran.net/audio/ibrahim-akhdar/r1/", "catalog": "https://www.mp3quran.net/api/v3/ayat_timing/reads", "terms": "https://apiquran.mp3quran.net/en/contact-us"},
+ "cases": [
+   {"id": "long-hafs-2-282", "kind": "continuous_long_ayah", "parts": [{"surah": 2, "start_ayah": 282, "end_ayah": 282, "max_seconds": 90}]},
+   {"id": "transition-hafs-112-113", "kind": "joined_publisher_chapters", "parts": [{"surah": 112, "start_ayah": 3, "end_ayah": 4, "through_file_end": true}, {"surah": 113, "from_file_start": true, "start_ayah": 1, "end_ayah": 2}]}
+ ]
+}

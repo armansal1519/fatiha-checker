@@ -1,0 +1,150 @@
+{
+  "schema_version": 1,
+  "manifest_sha256": "ec37f75f39d9599f6c51b88d2b1dfffe1a45eb0c03ff00e524192c3d8628ae7a",
+  "frozen_before_browser_inference": true,
+  "measurement": "Automatic localization; first binary PCM to two animation frames after first visible heard word and first definitive match, difference or gap. Separate missing observations and report conditional & all-clip quantiles.",
+  "selection": "For each professional reader choose the minimum SHA-256 of UTF-8 salt + NUL + clip ID among clips of duration >= 4 seconds. No model output used.",
+  "salt": "hamkhan-browser-latency-v1",
+  "clips": [
+    {
+      "id": "pro-1-75-4",
+      "audio": "audio/pro-1-75-4.wav",
+      "group": "mp3quran-1",
+      "split": "dev",
+      "surah": 75,
+      "ayah": 4,
+      "duration_s": 9.214,
+      "sha256": "4d109169aa7acef4e6bc04f93a8adc6bd7e645ec442458e423dda9296588488c"
+    },
+    {
+      "id": "pro-4-67-1",
+      "audio": "audio/pro-4-67-1.wav",
+      "group": "mp3quran-4",
+      "split": "dev",
+      "surah": 67,
+      "ayah": 1,
+      "duration_s": 7.56,
+      "sha256": "ed3b8f5313b9283cb1027cdd9fb8b79561cac7975ce0eca01d287b3c4b585d8c"
+    },
+    {
+      "id": "pro-5-67-3",
+      "audio": "audio/pro-5-67-3.wav",
+      "group": "mp3quran-5",
+      "split": "dev",
+      "surah": 67,
+      "ayah": 3,
+      "duration_s": 16.492,
+      "sha256": "4e6de772dd35ff73067d183cd875b738c9cdc220933c250832b760b79c029004"
+    },
+    {
+      "id": "pro-17-75-14",
+      "audio": "audio/pro-17-75-14.wav",
+      "group": "mp3quran-17",
+      "split": "dev",
+      "surah": 75,
+      "ayah": 14,
+      "duration_s": 4.76,
+      "sha256": "3599aab47d38954dd688fc227cbdd258a58c6ac379dc7b3557edaad5c89af94c"
+    },
+    {
+      "id": "pro-30-93-11",
+      "audio": "audio/pro-30-93-11.wav",
+      "group": "mp3quran-30",
+      "split": "dev",
+      "surah": 93,
+      "ayah": 11,
+      "duration_s": 4.48,
+      "sha256": "cb18aaad3c98abaa3bc259bebc68c0c420f084602436693656d020d17acb33ea"
+    },
+    {
+      "id": "pro-40-55-13",
+      "audio": "audio/pro-40-55-13.wav",
+      "group": "mp3quran-40",
+      "split": "dev",
+      "surah": 55,
+      "ayah": 13,
+      "duration_s": 6.96,
+      "sha256": "718e4d36e2c6aeaeca14b3e9c5c2ed30f37368cc8c89b515b14aff6989f87dd4"
+    },
+    {
+      "id": "pro-49-75-4",
+      "audio": "audio/pro-49-75-4.wav",
+      "group": "mp3quran-49",
+      "split": "holdout",
+      "surah": 75,
+      "ayah": 4,
+      "duration_s": 4.66,
+      "sha256": "5fc27dfb81563d2059f66a1b62eb93b27295ff394e8b1423327b8f58b6d4c510"
+    },
+    {
+      "id": "pro-56-75-14",
+      "audio": "audio/pro-56-75-14.wav",
+      "group": "mp3quran-56",
+      "split": "holdout",
+      "surah": 75,
+      "ayah": 14,
+      "duration_s": 6.62,
+      "sha256": "7f9603c04aecc214a76244aa0a266647acfb9ddf2ae1c5d110bbaf9a0fa60348"
+    },
+    {
+      "id": "pro-72-112-4",
+      "audio": "audio/pro-72-112-4.wav",
+      "group": "mp3quran-72",
+      "split": "holdout",
+      "surah": 112,
+      "ayah": 4,
+      "duration_s": 4.1491875,
+      "sha256": "456b5d09a15e10811053bd46b05c9cbecfaf2be9aedaa7bae96aff60cb89bb7e"
+    },
+    {
+      "id": "pro-92-75-4",
+      "audio": "audio/pro-92-75-4.wav",
+      "group": "mp3quran-92",
+      "split": "holdout",
+      "surah": 75,
+      "ayah": 4,
+      "duration_s": 6.66,
+      "sha256": "d5532ffca9c24a4c80535d220596635940a3e6c4535ab8fe7a2c0e57e832512f"
+    },
+    {
+      "id": "pro-118-87-14",
+      "audio": "audio/pro-118-87-14.wav",
+      "group": "mp3quran-118",
+      "split": "holdout",
+      "surah": 87,
+      "ayah": 14,
+      "duration_s": 6.461,
+      "sha256": "faf336753ad111a5882c610c005613b1fc0356a36f889906ba87af60a7ebeaa6"
+    },
+    {
+      "id": "pro-193-75-14",
+      "audio": "audio/pro-193-75-14.wav",
+      "group": "mp3quran-193",
+      "split": "holdout",
+      "surah": 75,
+      "ayah": 14,
+      "duration_s": 4.7,
+      "sha256": "b6416a607f5c86b45a8c213520d066a1b0491fbc2d7fa402ec8ddb349bce3781"
+    },
+    {
+      "id": "pro-219-75-4",
+      "audio": "audio/pro-219-75-4.wav",
+      "group": "mp3quran-219",
+      "split": "holdout",
+      "surah": 75,
+      "ayah": 4,
+      "duration_s": 8.62,
+      "sha256": "1469884574f5fe0c754eb6d826fae8f64a7e9d6b40b1d16ce2721bac1b28a86c"
+    },
+    {
+      "id": "pro-243-55-13",
+      "audio": "audio/pro-243-55-13.wav",
+      "group": "mp3quran-243",
+      "split": "holdout",
+      "surah": 55,
+      "ayah": 13,
+      "duration_s": 5.98,
+      "sha256": "58ab4d0e1cb299ef650e8b8b9cbf1578fadeb922beef81c6c7c8066f7722c1d2"
+    }
+  ]
+}

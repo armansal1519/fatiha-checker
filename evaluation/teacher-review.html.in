@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>هم‌خوان | بازشنوی استاد</title>
+  <style>
+    @font-face{font-family:Vazirmatn;src:url(data:font/woff2;base64,$vazir) format('woff2');font-weight:100 900;font-display:swap}
+    @font-face{font-family:Amiri;src:url(data:font/ttf;base64,$amiri) format('truetype');font-display:swap}
+    :root{font:16px/1.75 Vazirmatn,Tahoma,sans-serif;color:#233e34;background:#f7f7ef;accent-color:#205941}
+    *{box-sizing:border-box} body{margin:0} main{max-width:52rem;margin:auto;padding:1rem clamp(.9rem,4vw,2.75rem) 3rem}
+    header,.toolbar,.actions,.pair{display:flex;gap:.65rem;align-items:center;flex-wrap:wrap}
+    header{justify-content:space-between;border-bottom:1px solid #cad1c4;padding:.35rem 0 1rem}
+    .brand{font-weight:750}.muted,small{color:#516255}h1{font-size:1.55rem;line-height:1.5;margin:1.3rem 0 .3rem}
+    p{margin:.3rem 0 1rem}fieldset{border:0;padding:0;margin:1rem 0}.toolbar{justify-content:space-between}
+    .line{border-top:1px solid #cad1c4;margin-top:1.2rem;padding-top:.8rem}
+    .reader{background:#fffef8;border:1px solid #c7d1c2;border-radius:14px;padding:clamp(1rem,3vw,1.7rem);margin:1rem 0}
+    .verse{font:1.8rem/2.15 Amiri,serif;margin:.5rem 0 1rem}.verse mark{background:#e0ebce;color:#183b2c;border-bottom:2px solid #547b48;border-radius:3px}
+    audio{display:block;width:100%;max-width:100%;height:48px;margin-top:.4rem}
+    label,legend{font-weight:550}button,input,select,textarea{font:inherit;color:inherit}
+    button,select,input:not([type=radio]),textarea{border:1px solid #a2b2a1;border-radius:7px;background:#fffef8;padding:.4rem .7rem;max-width:100%}
+    button,select{cursor:pointer;min-height:44px}button:disabled{opacity:.45;cursor:default}
+    button.primary{background:#1d513b;color:white;border-color:#1d513b} input[type=radio]{width:1.1rem;height:1.1rem}
+    :focus-visible{outline:3px solid #427d69;outline-offset:3px}
+    .choices{display:flex;gap:.4rem 1rem;flex-wrap:wrap}.choices label{display:inline-flex;gap:.3rem;align-items:center;min-height:44px}
+    .pair{align-items:flex-start}.pair>label,.pair>.time{flex:1 1 14rem;min-width:0}.pair input,.full,textarea{width:100%;display:block}
+    .time button{margin:.35rem 0 .5rem}textarea{resize:vertical}.actions{margin-top:.8rem}
+    .error{color:#893928}#message{min-height:1.7em}.aux{margin-top:1.4rem}details summary{cursor:pointer;min-height:44px;font-weight:550}
+    a{color:#1f5e4a}code,pre{overflow-wrap:anywhere;white-space:pre-wrap;font-size:.8rem}pre{direction:ltr;text-align:left}
+    #source-list{max-height:12rem;overflow:auto}#source-list code{display:inline-block;direction:ltr}
+    @media(max-width:32rem){.reader{padding:.85rem}.verse{font-size:1.55rem}.pair{gap:.3rem}.pair>label,.pair>.time{flex-basis:100%}}
+  </style>
+</head>
+<body><main>
+  <header><span class="brand">هم‌خوان</span><span id="progress" role="status"></span></header>
+  <h1>بازشنوی قرائت</h1>
+  <p>استاد گرامی، به واژهٔ مشخص‌شده در هر قطعه گوش دهید و نظر خود را دربارهٔ حروف آن ثبت کنید. اگر واژه به‌روشنی شنیده نمی‌شود، «قابل تشخیص نیست» را انتخاب کنید. برای فرستادن نتیجه از «دانلود پاسخ‌ها» استفاده کنید.</p>
+  <div class="toolbar"><label for="jump">انتخاب نمونه <select id="jump"></select></label><span id="position" class="muted"></span></div>
+  <section class="reader" aria-labelledby="verse-ref">
+    <strong id="verse-ref"></strong><p id="verse" class="verse" lang="ar"></p>
+    <audio id="audio" aria-label="صدای قرائت" controls preload="metadata"></audio>
+  </section>
+  <fieldset><legend>حروف واژهٔ مشخص‌شده چگونه شنیده شدند؟</legend>
+    <div class="choices"><label><input type="radio" name="status" value="match">مطابق مرجع</label>
+    <label><input type="radio" name="status" value="difference">اختلاف حرفی</label>
+    <label><input type="radio" name="status" value="uncertain">قابل تشخیص نیست</label></div>
+  </fieldset>
+  <div class="pair"><label>حرف یا عبارت مورد انتظار<input id="expected" dir="auto" maxlength="200" autocomplete="off"></label>
+    <label>حرف یا عبارت شنیده‌شده<input id="heard" dir="auto" maxlength="200" autocomplete="off"></label></div>
+  <details class="line" id="timing"><summary>مشخص کردن زمان واژه یا حرف (اختیاری)</summary>
+    <p class="muted">زمان‌ها بر حسب ثانیه از ابتدای همین فایل هستند. می‌توانید هر دو را بنویسید یا هنگام مکث پخش‌کننده ثبت کنید.</p>
+    <div class="pair">
+      <div class="time"><label for="start">آغاز (ثانیه)</label><input id="start" dir="ltr" inputmode="decimal" maxlength="12"><button type="button" id="stamp-start">ثبت زمانِ آغاز از پخش‌کننده</button></div>
+      <div class="time"><label for="end">پایان (ثانیه)</label><input id="end" dir="ltr" inputmode="decimal" maxlength="12"><button type="button" id="stamp-end">ثبت زمانِ پایان از پخش‌کننده</button></div>
+    </div>
+    <button type="button" id="listen-range">شنیدن بازه</button>
+  </details>
+  <label class="full" for="note">یادداشت شما (اختیاری)</label><textarea id="note" rows="2" maxlength="1000"></textarea>
+  <div class="actions">
+    <button type="button" id="prev">نمونهٔ قبل</button><button type="button" id="next" class="primary">نمونهٔ بعد</button>
+    <button type="button" id="save">دانلود پاسخ‌ها</button>
+  </div>
+  <p id="message" role="status" aria-live="polite"></p>
+  <details class="line aux"><summary>ادامهٔ بررسی از فایل پاسخ</summary>
+    <p>می‌توانید پاسخ‌های کامل یا نیمه‌تمام را دانلود کنید و دفعهٔ بعد از همان فایل ادامه دهید. فایل JSON نهایی را برای فرستندهٔ بسته بفرستید.</p>
+    <label>انتخاب فایل پاسخ <input id="restore" type="file" accept=".json,application/json"></label>
+  </details>
+  <details class="line aux"><summary>منابع و مجوزها</summary>
+    <p>فایل‌های صوتی از مجموعهٔ عمومی <bdi>sobolev210/quran-recitation-errors</bdi> با مجوز اعلام‌شدهٔ MIT هستند. در این بسته فایل اصلی هر ضبط همراه با کد بازبینی آن قرار دارد. <a href="$dataset" rel="noreferrer">صفحهٔ ناشر در نسخهٔ مورد استفاده</a></p>
+    <ol id="source-list">$sources</ol>
+    <pre>MIT License
+
+Dataset attribution: sobolev210/quran-recitation-errors and the original contributors.
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of
+this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.</pre>
+    <details><summary>مجوز قلم‌های امیری و وزیرمتن</summary><pre>$notices</pre></details>
+  </details>
+  <noscript>برای ثبت نظر و پخش نمونه‌ها، این فایل را در یک مرورگر با جاوااسکریپت فعال باز کنید.</noscript>
+</main><script id="packet" type="application/json">$payload</script><script>$script</script></body></html>

@@ -27,6 +27,10 @@ tests/audio_samples/
 data/
 recordings/
 reports/*.json
+reports/hamkhan-teacher-review.html
+reports/teacher-review*.csv
+hamkhan-issue*.json
+hamkhan-teacher-answers*.json
 *.wav
 *.mp3
 *.m4a

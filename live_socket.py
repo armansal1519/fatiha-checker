@@ -1,14 +1,17 @@
-"""Bounded, local WebSocket audio transport and server-owned live results.
+"""Version 2 local PCM transport and bounded two-stage live inference.
 
-One receiving thread keeps draining PCM while one shared executor runs the model.
-No audio jobs are queued: a completed job is followed by the newest ring snapshot.
+The receiver owns session state. A single worker publishes raw transcription
+before checking the same audio with Muaalem. Every new audio interval is either
+processed in order or explicitly classified as silence; recent audio never
+silently replaces an older, unprocessed interval.
 """
 from concurrent.futures import ThreadPoolExecutor
 from fractions import Fraction
 import json
 import logging
+from queue import Empty, Full, Queue
 import struct
-from threading import Lock
+from threading import Event, Lock
 from time import monotonic, perf_counter
 from urllib.parse import urlsplit
 from uuid import uuid4
@@ -19,10 +22,16 @@ from flask import jsonify, request
 from flask_sock import Sock
 from simple_websocket import ConnectionClosed
 
+from audio_processing import MIN_AUDIO_RMS
+
 RATE = 16000
-CAPACITY = 10 * RATE
+CAPACITY = 30 * RATE
+WINDOW = 8 * RATE
+OVERLAP = 2 * RATE
+FIRST_AUDIO = 2 * RATE
+FRESH_AUDIO = RATE
 MAX_MESSAGE = 64 * 1024
-MAX_SECONDS = 180
+MAX_SECONDS = 30 * 60
 RATES = {16000, 44100, 48000}
 log = logging.getLogger(__name__)
 
@@ -39,6 +48,10 @@ class AudioRing:
         self.capacity = capacity
         self.total = 0
 
+    @property
+    def oldest(self):
+        return max(0, self.total - self.capacity)
+
     def append(self, samples):
         samples = np.asarray(samples, dtype=np.float32).reshape(-1)
         original_size = len(samples)
@@ -50,13 +63,17 @@ class AudioRing:
         self.data[:len(samples) - first] = samples[first:]
         self.total += original_size
 
-    def snapshot(self, end=None, seconds=10):
+    def slice(self, start, end):
+        if start < self.oldest or end > self.total or end < start:
+            raise ProtocolError("backlog", "بررسی از صدا عقب افتاد؛ این نوبت کامل نیست. دوباره شروع کنید.")
+        return self.data[np.arange(start, end) % self.capacity].copy()
+
+    def snapshot(self, end=None, seconds=30):
         end = min(self.total, self.total if end is None else end)
-        start = max(0, self.total - self.capacity, end - int(seconds * RATE))
+        start = max(self.oldest, end - int(seconds * RATE))
         if end <= start:
             return np.empty(0, dtype=np.float32)
-        indices = np.arange(start, end) % self.capacity
-        return self.data[indices].copy()
+        return self.slice(start, end)
 
 
 class PcmInput:
@@ -77,7 +94,7 @@ class PcmInput:
             raise ProtocolError("sequence", "پیوستگی صدا از بین رفت. لطفاً دوباره شروع کنید.")
         pcm = np.frombuffer(packet, dtype="<i2", offset=8).copy()
         if self.input_samples + len(pcm) > self.sample_rate * MAX_SECONDS:
-            raise ProtocolError("duration", "زمان هر نوبت حداکثر سه دقیقه است.")
+            raise ProtocolError("duration", "زمان هر نوبت حداکثر ۳۰ دقیقه است.")
         frame = av.AudioFrame.from_ndarray(pcm.reshape(1, -1), format="s16", layout="mono")
         frame.sample_rate = self.sample_rate
         frame.pts = self.input_samples
@@ -98,72 +115,107 @@ class PcmInput:
         return self._samples(self.resampler.resample(None))
 
 
-class StableWords:
-    def __init__(self, total_words, start_index):
-        self.words = {}
-        self.pending = {}
-        self.total_words = total_words
-        self.start_index = start_index
+def _make_tracker(corpus, start_surah, start_ayah):
+    from transcript_tracking import TranscriptTracker
+    return TranscriptTracker(corpus, start_surah=start_surah, start_ayah=start_ayah)
 
-    def observe(self, updates, analyzed_samples, settled):
-        for update in updates:
-            index = update["index"]
-            if not self.start_index <= index < self.total_words:
-                continue
-            signature = (update["state"], tuple((e["type"], e["message"]) for e in update["errors"]))
-            old_signature, count, endpoint = self.pending.get(index, (None, 0, -1))
-            count = count + 1 if signature == old_signature and analyzed_samples > endpoint else 1
-            self.pending[index] = (signature, count, analyzed_samples)
-            if settled or count >= 2:
-                self.words[index] = update
 
-    def summary(self):
-        return {"reviewed": len(self.words),
-                "differences": sum(w["state"] == "difference" for w in self.words.values()),
-                "unreviewed": self.total_words - self.start_index - len(self.words)}
+def validate_reference(corpus, surah, ayah):
+    if type(surah) is not int or type(ayah) is not int:
+        raise ProtocolError("ayah", "سوره و آیهٔ شروع معتبر نیست.")
+    try:
+        corpus.reference(surah, ayah)
+    except (ValueError, KeyError, IndexError, AssertionError):
+        raise ProtocolError("ayah", "سوره و آیهٔ شروع معتبر نیست.") from None
 
 
 class LiveSession:
-    def __init__(self, start, follower):
-        if not isinstance(start, dict) or start.get("type") != "start" or start.get("version") != 1:
+    def __init__(self, start, corpus, tracker_factory=None):
+        if not isinstance(start, dict) or start.get("type") != "start":
             raise ProtocolError("start", "اطلاعات شروع قرائت معتبر نیست. صفحه را تازه کنید.")
-        rate, ayah = start.get("sample_rate"), start.get("start_ayah")
+        if start.get("version") != 2:
+            raise ProtocolError("version", "نسخهٔ ارتباط زنده تغییر کرده است؛ صفحه را تازه کنید.")
+        rate = start.get("sample_rate")
         if type(rate) is not int or rate not in RATES or start.get("channels") != 1:
             raise ProtocolError("sample_rate", "قالب صدای مرورگر پشتیبانی نمی‌شود.")
-        if type(ayah) is not int or ayah not in follower.ayah_starts:
-            raise ProtocolError("ayah", "آیهٔ شروع معتبر نیست.")
+        surah, ayah = start.get("start_surah"), start.get("start_ayah")
+        if surah is not None or ayah is not None:
+            validate_reference(corpus, surah, ayah)
         self.id = uuid4().hex
+        self.corpus = corpus
+        self.tracker = (tracker_factory or _make_tracker)(corpus, surah, ayah)
         self.input = PcmInput(rate)
         self.ring = AudioRing()
-        self.start_ayah = ayah
-        self.cursor = follower.ayah_starts[ayah]
-        self.current_word = None
-        self.words = StableWords(len(follower.words), self.cursor)
-        self.started = monotonic()
-        self.received_at = self.started
-        self.last_activity = self.started
+        self.stages = Queue(maxsize=4)
+        self.closed = Event()
+        self.started = self.last_activity = self.received_at = monotonic()
         self.voice_end = 0
-        self.last_scheduled_voice = 0
-        self.last_analyzed = 0
         self.last_settled_voice = 0
+        self.analyzed_samples = 0
+        # Reuse a growing, anchored ASR context instead of cutting the left
+        # edge one second forward after every fast inference.
+        self.context_start = 0
+        self.committed_samples = 0
+        self.skipped_silence_samples = 0
+        self.model_samples = 0
+        self.coverage_intervals = []
         self.last_completed = 0
-        self.future = None
-        self.job = None
+        self.future = self.job = None
         self.revision = 0
-        self.stopping = False
-        self.final_scheduled = False
+        self.stopping = self.final_scheduled = False
         self.last_status = "listening"
         self.last_message = "چند کلمهٔ پیوسته بخوانید."
-        self.timings = {}
-        self.first_progress_ms = None
-        self.first_color_ms = None
-        self.inference_times = []
         self.last_busy = 0
+        self.first_transcript_ms = self.first_feedback_ms = self.first_position_ms = None
+        self.inference_times = []
+        self.max_retained_samples = 0
+        self.peak_unanalyzed_samples = 0
+        self.peak_waiting_stages = 0
+
+    def _cover(self, end, *, silence=False):
+        """Advance only across the immediately next interval, never a hole."""
+        if end < self.analyzed_samples or end > self.ring.total:
+            raise RuntimeError("Invalid analyzed audio cursor")
+        count = end - self.analyzed_samples
+        if count:
+            kind = "silence" if silence else "model"
+            if (self.coverage_intervals and self.coverage_intervals[-1][1] == self.analyzed_samples
+                    and self.coverage_intervals[-1][2] == kind):
+                self.coverage_intervals[-1][1] = end
+            else:
+                self.coverage_intervals.append([self.analyzed_samples, end, kind])
+            self.analyzed_samples = end
+            if silence:
+                self.skipped_silence_samples += count
+            else:
+                self.model_samples += count
 
     def append(self, samples):
+        samples = np.asarray(samples, dtype=np.float32).reshape(-1)
+        if not len(samples):
+            return
+        has_energy = float(np.sqrt(np.mean(samples.astype(np.float64) ** 2))) >= MIN_AUDIO_RMS
+        # A growing context may still need its complete eight-second history,
+        # including a word that straddles the next nominal overlap boundary.
+        # An in-flight worker owns its snapshot, but its next context must also
+        # remain available. Stop before either context or new audio is erased.
+        owned_end = self.job["end"] if self.future is not None else self.analyzed_samples
+        protected_start = max(0, owned_end - WINDOW)
+        after_oldest = max(0, self.ring.total + len(samples) - self.ring.capacity)
+        if after_oldest > protected_start:
+            raise ProtocolError("backlog", "بررسی از صدا عقب افتاد؛ این نوبت کامل نیست. دوباره شروع کنید.")
+        can_skip = (not has_energy and self.future is None
+                    and self.analyzed_samples == self.ring.total
+                    and self.last_settled_voice >= self.voice_end)
         self.ring.append(samples)
-        if len(samples) and float(np.sqrt(np.mean(samples.astype(np.float64) ** 2))) > .001:
+        self.max_retained_samples = max(self.max_retained_samples, min(self.ring.total, self.ring.capacity))
+        if has_energy:
             self.voice_end = self.ring.total
+        elif can_skip:
+            self._cover(self.ring.total, silence=True)
+            self.committed_samples = self.analyzed_samples
+        self.peak_unanalyzed_samples = max(self.peak_unanalyzed_samples,
+                                          self.ring.total-self.analyzed_samples)
 
     def accept(self, message):
         self.last_activity = self.received_at = monotonic()
@@ -173,7 +225,13 @@ class LiveSession:
             self.append(self.input.convert(message))
             return {"type": "ack", "sequence": self.input.sequence, "input_samples": self.input.input_samples}
         command = parse_json(message)
-        if command.get("type") != "stop" or self.stopping:
+        if self.stopping:
+            raise ProtocolError("command", "این نوبت پایان یافته است. دوباره شروع کنید.")
+        if command.get("type") == "reference":
+            surah, ayah = command.get("surah"), command.get("ayah")
+            validate_reference(self.corpus, surah, ayah)
+            return dict(type="feedback", **self.tracker.select_reference(surah, ayah))
+        if command.get("type") != "stop":
             raise ProtocolError("command", "پیام قرائت شناخته نشد. دوباره شروع کنید.")
         if command.get("last_sequence") != self.input.sequence or command.get("total_samples") != self.input.input_samples:
             raise ProtocolError("sequence", "همهٔ بخش‌های صدا دریافت نشد. دوباره شروع کنید.")
@@ -181,64 +239,130 @@ class LiveSession:
         self.stopping = True
         return None
 
+    def _analysis_start(self, *, require_progress):
+        """Grow an anchor to eight seconds, then roll by at most six seconds.
+
+        The tracker may move the next left boundary back to a complete mutable
+        word. A word longer than the whole analysis window cannot hold up the
+        stream forever: retain transport continuity and let the tracker keep
+        that incomplete occurrence ungraded instead.
+        """
+        covered = self.analyzed_samples
+        proposed = self.context_start
+        if covered - proposed >= WINDOW and require_progress:
+            proposed = max(0, covered - OVERLAP)
+        helper = getattr(self.tracker, "analysis_start", None)
+        adjusted = helper(proposed) if callable(helper) else proposed
+        if type(adjusted) is not int or not 0 <= adjusted <= proposed:
+            raise RuntimeError("Tracker returned an invalid analysis context boundary")
+        if require_progress and adjusted + WINDOW <= covered:
+            adjusted = proposed
+        if adjusted < self.ring.oldest:
+            raise ProtocolError("backlog", "زمینهٔ لازم برای بررسی از بافر خارج شد؛ این نوبت کامل نیست. دوباره شروع کنید.")
+        return adjusted
+
     def candidate(self, now):
-        if self.future is not None or now - self.last_completed < .1:
+        if self.future is not None or self.final_scheduled or now - self.last_completed < .05:
             return None
-        if self.stopping and self.final_scheduled:
+        total = self.ring.total
+        if not total or not self.voice_end:
             return None
-        settled = self.stopping or self.ring.total - self.voice_end >= int(.5 * RATE)
-        if not self.voice_end or self.ring.total < int(.8 * RATE):
+        paused = total - self.voice_end >= RATE // 2
+        pause_review = paused and self.voice_end > self.last_settled_voice
+        new = total - self.analyzed_samples
+        if self.stopping and not new and self.last_settled_voice >= self.voice_end:
             return None
-        end = min(self.ring.total, self.voice_end + int(.25 * RATE)) if settled else self.ring.total
-        new_audio = end - self.last_analyzed >= int(.5 * RATE)
-        new_voice = self.voice_end > self.last_scheduled_voice
-        new_pause = settled and self.voice_end > self.last_settled_voice
-        if not self.stopping and not ((new_audio and new_voice) or new_pause):
-            return None
-        seconds = 10 if settled or self.last_status == "listening" else 6
-        wave = self.ring.snapshot(end=end, seconds=seconds)
-        if len(wave) < int(.5 * RATE):
-            return None
-        return dict(wave=wave, end=end, voice=self.voice_end, settled=settled, final=self.stopping,
+        if not self.stopping:
+            if not self.inference_times and total < FIRST_AUDIO:
+                return None
+            if new < FRESH_AUDIO and not pause_review:
+                return None
+            if self.voice_end <= self.analyzed_samples and not pause_review:
+                # Only received silence remains and the spoken edge was checked.
+                self._cover(total, silence=True)
+                self.committed_samples = self.analyzed_samples
+                return None
+        start = self._analysis_start(require_progress=new > 0)
+        end = min(total, start + WINDOW)
+        if end < self.analyzed_samples:
+            raise RuntimeError("Analysis window cannot move backwards")
+        settled = end >= self.voice_end and (self.stopping or paused)
+        return dict(start=start, end=end, wave=self.ring.slice(start, end),
+                    settled=settled, final=self.stopping and end == total,
+                    voice=self.voice_end,
                     receive_to_dispatch_ms=round((now-self.received_at)*1000, 1))
 
-    def finish_result(self, result):
-        job = self.job
-        self.future = self.job = None
-        self.last_completed = monotonic()
-        self.last_analyzed = job["end"]
-        if job["settled"]:
-            self.last_settled_voice = job["voice"]
-        self.revision += 1
-        self.cursor = max(self.cursor, result["cursor"])
-        self.current_word = result.get("current_word")
-        self.last_status = result.get("status", "listening")
-        self.last_message = result.get("message", self.last_message)
-        self.words.observe(result.get("updates", []), job["end"], job["settled"])
-        elapsed = round((self.last_completed-self.started)*1000, 1)
-        if self.last_status == "tracking" and self.first_progress_ms is None:
-            self.first_progress_ms = elapsed
-        if self.words.words and self.first_color_ms is None:
-            self.first_color_ms = elapsed
-        self.timings = dict(result.get("timings", {}), server_receive_to_dispatch_ms=job["receive_to_dispatch_ms"])
-        self.inference_times.append(self.timings.get("inference_ms", 0))
+    def apply_stage(self, stage):
+        job, kind = stage["job"], stage["stage"]
+        stage_start = perf_counter()
+        kwargs = dict(start_sample=job["start"], end_sample=job["end"], settled=job["settled"])
+        elapsed = round((monotonic()-self.started)*1000, 1)
+        if kind != "feedback":
+            if kind == "preview":
+                result = self.tracker.preview_transcript(stage["result"], **kwargs)
+                job["preview_deferred"] = result is None
+            elif kind == "confirm" and not stage["revised"] and not job.get("preview_deferred"):
+                result = self.tracker.commit_preview(job["end"],job["settled"])
+            else:
+                result = self.tracker.update_transcript(stage["result"], **kwargs)
+            kind = "transcript"
+            if result and result.get("tokens") and self.first_transcript_ms is None:
+                self.first_transcript_ms = elapsed
+        else:
+            result = self.tracker.update_phonemes(stage["result"], **kwargs)
+            self.last_status = result.get("status", "listening")
+            self.last_message = result.get("message", self.last_message)
+            if self.last_status == "tracking" and self.first_position_ms is None:
+                self.first_position_ms = elapsed
+            if any(u.get("state") in {"match", "difference"} for u in result.get("updates", [])) and self.first_feedback_ms is None:
+                self.first_feedback_ms = elapsed
+        timing_key = "merge_ms" if kind == "transcript" else "alignment_ms"
+        stage_ms = round((perf_counter()-stage_start)*1000, 2)
+        job[timing_key] = round(job.get(timing_key, 0) + stage_ms, 2)
+        if result is None:
+            return None
+        event = dict(type=kind if kind == "transcript" else "feedback", **result,
+                     start_sample=job["start"], end_sample=job["end"],
+                     timings={**stage["timings"], timing_key: stage_ms})
+        if kind == "transcript" and isinstance(stage["result"].get("audio_activity"), dict):
+            event["audio_activity"] = dict(stage["result"]["audio_activity"])
+        return event
 
-    def result_fields(self):
-        return dict(revision=self.revision, cursor=self.cursor, current_word=self.current_word,
-                    analyzed_samples=self.last_analyzed,
-                    updates=[self.words.words[k] for k in sorted(self.words.words)],
-                    summary=self.words.summary(), timings=self.timings)
+    def finish_job(self, timings):
+        job = self.job
+        if job["start"] > self.analyzed_samples:
+            raise RuntimeError("An audio interval was skipped")
+        self._cover(job["end"])
+        self.context_start = job["start"]
+        if job["settled"]:
+            self.last_settled_voice = max(self.last_settled_voice, min(job["voice"], job["end"]))
+        self.committed_samples = max(self.committed_samples, job["end"] if job["settled"] else max(0, job["end"]-OVERLAP))
+        self.inference_times.append({**timings, **{k:job[k] for k in ("merge_ms","alignment_ms") if k in job}})
+        self.last_completed = monotonic()
+        self.future = self.job = None
 
     def metrics(self):
-        return dict(first_progress_ms=self.first_progress_ms, first_color_ms=self.first_color_ms,
-                    first_position_ms=self.first_progress_ms,
-                    analyses=len(self.inference_times), inference_ms=self.inference_times,
+        return dict(first_transcript_ms=self.first_transcript_ms, first_feedback_ms=self.first_feedback_ms,
+                    first_position_ms=self.first_position_ms, analyses=len(self.inference_times),
+                    inference_ms=[x.get("worker_ms", 0) for x in self.inference_times],
+                    stage_timings=self.inference_times,
                     input_samples=self.input.input_samples, output_samples=self.ring.total,
                     total_received_samples=self.input.input_samples,
-                    ring_max_samples=min(self.ring.total, self.ring.capacity),
+                    received_samples=self.ring.total, analyzed_samples=self.analyzed_samples,
+                    committed_samples=self.committed_samples,
+                    skipped_silence_samples=self.skipped_silence_samples, model_samples=self.model_samples,
+                    coverage_complete=self.analyzed_samples == self.ring.total,
+                    coverage_intervals=self.coverage_intervals,
+                    ring_max_samples=self.max_retained_samples, buffer_capacity_samples=self.ring.capacity,
+                    peak_unanalyzed_samples=self.peak_unanalyzed_samples, peak_waiting_stages=self.peak_waiting_stages,
                     inference_max_inflight=1 if self.inference_times else 0, queued_inference_jobs=0,
-                    buffer_capacity_samples=self.ring.capacity,
                     elapsed_ms=round((monotonic()-self.started)*1000, 1))
+
+    def done_fields(self):
+        return dict(summary=self.tracker.summary(), reference=getattr(self.tracker, "current_reference", None),
+                    status=self.last_status, received_samples=self.ring.total,
+                    analyzed_samples=self.analyzed_samples, committed_samples=self.committed_samples,
+                    committed_count=getattr(self.tracker, "committed_count", 0), metrics=self.metrics())
 
 
 def parse_json(message):
@@ -254,20 +378,62 @@ def parse_json(message):
 
 
 class LiveSocketManager:
-    def __init__(self, service, follower, inference_lock):
-        self.service, self.follower, self.inference_lock = service, follower, inference_lock
+    def __init__(self, service, transcriber, corpus, inference_lock, tracker_factory=None):
+        self.service, self.transcriber, self.corpus = service, transcriber, corpus
+        self.inference_lock = inference_lock
+        self.tracker_factory = tracker_factory
         self.session_lock = Lock()
         self.executor = ThreadPoolExecutor(max_workers=1, thread_name_prefix="live-inference")
 
     def shutdown(self):
         self.executor.shutdown(wait=True, cancel_futures=True)
 
-    def infer(self, wave, cursor, start_ayah, settled):
-        started = perf_counter()
+    def infer(self, job, stages, closed):
+        began = perf_counter()
+        timings = {}
         try:
-            result = self.follower.analyze(self.service, wave, cursor, start_ayah, settled)
-            result.setdefault("timings", {})["worker_ms"] = round((perf_counter()-started)*1000, 1)
-            return result
+            transcript = self.transcriber.transcribe(job["wave"])
+            timings["transcription_ms"] = round((perf_counter()-began)*1000, 1)
+            activity = transcript.get("audio_activity")
+            status = activity.get("status") if isinstance(activity, dict) else None
+            timings["transcription_skipped"] = status in {"no_speech", "uncertain"}
+            frames = activity.get("evaluated_frames", 0) if isinstance(activity, dict) else 0
+            timings["vad_frames"] = frames if type(frames) is int and frames >= 0 else None
+            if status is not None:
+                timings["activity_status"] = status
+            if closed.is_set():
+                return timings
+            verify = getattr(self.transcriber,"recover_repetitions",None)
+            preview = bool(verify and transcript.get("words") and not timings["transcription_skipped"])
+            stages.put_nowait(dict(stage="preview" if preview else "transcript", result=transcript,
+                                   job=job, timings=dict(timings)))
+            if timings["transcription_skipped"]:
+                # Activity detection runs inside this worker, never on the ACK
+                # receiver. Ambient noise must not trigger phonetic verdicts.
+                timings["phonetic_ms"] = 0.0
+                timings["phonetic_skipped"] = True
+                timings["worker_ms"] = round((perf_counter()-began)*1000, 1)
+                if not closed.is_set():
+                    stages.put_nowait(dict(stage="feedback", result=dict(audio_activity=dict(activity)),
+                                           job=job, timings=dict(timings)))
+                return timings
+            phonemes_at = perf_counter()
+            phonemes = self.service.predict_live_timed(job["wave"])
+            timings["phonetic_ms"] = round((perf_counter()-phonemes_at)*1000, 1)
+            timings["phonetic_skipped"] = False
+            if preview and not closed.is_set():
+                checked_at = perf_counter()
+                confirmed = verify(transcript,phonemes,job["wave"])
+                timings["repeat_check_ms"] = round((perf_counter()-checked_at)*1000,1)
+                if not closed.is_set():
+                    stages.put_nowait(dict(stage="confirm",result=confirmed,revised=confirmed is not transcript,
+                                           job=job,timings=dict(timings)))
+            timings["worker_ms"] = round((perf_counter()-began)*1000, 1)
+            if not closed.is_set():
+                stages.put_nowait(dict(stage="feedback", result=phonemes, job=job, timings=dict(timings)))
+            return timings
+        except Full:
+            raise RuntimeError("Live result channel exceeded its fixed capacity") from None
         finally:
             self.inference_lock.release()
 
@@ -278,57 +444,77 @@ class LiveSocketManager:
         def send(event):
             if session is not None:
                 event["session_id"] = session.id
+                if event.get("type") != "ack":
+                    session.revision += 1
+                    event["revision"] = session.revision
             ws.send(json.dumps(event, ensure_ascii=False, separators=(",", ":")))
 
+        def drain_stages():
+            session.peak_waiting_stages = max(session.peak_waiting_stages, session.stages.qsize())
+            while True:
+                try:
+                    stage = session.stages.get_nowait()
+                except Empty:
+                    return
+                event = session.apply_stage(stage)
+                if event is not None:
+                    send(event)
+
         try:
-            if not self.service.ready:
-                raise ProtocolError("not_ready", "مدل هنوز آماده نیست. برنامه را دوباره راه‌اندازی کنید.")
+            if not self.service.ready or not self.transcriber.ready:
+                raise ProtocolError("not_ready", "مدل‌های رونویسی و بررسی آماده نیستند. پیام راه‌اندازی برنامه را بررسی کنید.")
             owns_session = self.session_lock.acquire(blocking=False)
             if not owns_session:
                 raise ProtocolError("session_busy", "یک نوبت قرائت زنده در حال اجراست. ابتدا آن را پایان دهید.")
             first = ws.receive(timeout=10)
             if first is None:
                 raise ProtocolError("timeout", "شروع قرائت دریافت نشد. دوباره تلاش کنید.")
-            session = LiveSession(parse_json(first), self.follower)
-            send(dict(type="ready", version=1))
+            session = LiveSession(parse_json(first), self.corpus, self.tracker_factory)
+            send(dict(type="ready", version=2, sample_rate=RATE, max_seconds=MAX_SECONDS))
             while True:
                 message = ws.receive(timeout=.02)
                 if message is not None:
-                    ack = session.accept(message)
-                    if ack:
-                        send(ack)
+                    event = session.accept(message)
+                    if event:
+                        send(event)
                 now = monotonic()
-                if now - session.started > MAX_SECONDS + 30 or (not session.stopping and now-session.last_activity > 15):
+                if now-session.started > MAX_SECONDS+120 or (not session.stopping and now-session.last_activity > 15):
                     raise ProtocolError("timeout", "ارتباط دریافت صدا متوقف شد. دوباره شروع کنید.")
+                drain_stages()
                 if session.future is not None and session.future.done():
-                    result = session.future.result()
+                    # A worker may have published its last stage just after the
+                    # previous drain; consume it before marking coverage done.
+                    timings = session.future.result()
+                    drain_stages()
                     final = session.job["final"]
-                    session.finish_result(result)
-                    send(dict(type="progress", revision=session.revision, cursor=session.cursor,
-                              current_word=session.current_word, analyzed_samples=session.last_analyzed,
-                              phase=session.last_status, message=session.last_message))
-                    send(dict(type="result", **session.result_fields()))
+                    session.finish_job(timings)
                     if final:
-                        send(dict(type="done", **session.result_fields(), metrics=session.metrics()))
+                        send(dict(type="done", **session.done_fields()))
                         return
                 job = session.candidate(now)
                 if job is not None:
                     if self.inference_lock.acquire(blocking=False):
+                        session.job = job
                         try:
-                            session.future = self.executor.submit(self.infer, job["wave"], session.cursor,
-                                                                  session.start_ayah, job["settled"])
+                            session.future = self.executor.submit(self.infer, job, session.stages, session.closed)
                         except BaseException:
+                            session.job = None
                             self.inference_lock.release()
                             raise
-                        session.job = job
-                        session.last_scheduled_voice = job["voice"]
                         session.final_scheduled = job["final"]
-                    elif now - session.last_busy > 2:
+                    elif now-session.last_busy > 2:
                         send(dict(type="error", code="model_busy", message="مدل در حال بررسی صدای قبلی است؛ لحظه‌ای صبر کنید.", fatal=False))
                         session.last_busy = now
-                elif session.stopping and session.future is None and now - session.last_completed >= .1:
-                    # Silence or too little usable audio: finish without invented results.
-                    send(dict(type="done", **session.result_fields(), metrics=session.metrics()))
+                elif (session.stopping and session.future is None
+                      and session.voice_end <= session.analyzed_samples
+                      and session.last_settled_voice >= session.voice_end):
+                    # Only an empty stream or a fully reviewed spoken edge can
+                    # finish without another job. A scheduling cooldown must
+                    # never classify an unprocessed backlog as silence.
+                    if session.analyzed_samples < session.ring.total:
+                        session._cover(session.ring.total, silence=True)
+                        session.committed_samples = session.analyzed_samples
+                    send(dict(type="done", **session.done_fields()))
                     return
         except ProtocolError as exc:
             try:
@@ -344,9 +530,8 @@ class LiveSocketManager:
             except ConnectionClosed:
                 pass
         finally:
-            # Running native inference cannot safely be interrupted. It owns its
-            # snapshot and releases the shared lock, but can no longer publish.
             if session is not None:
+                session.closed.set()
                 session.ring.data = np.empty(0, dtype=np.float32)
             if owns_session:
                 self.session_lock.release()
@@ -356,8 +541,8 @@ class LiveSocketManager:
                 pass
 
 
-def register_live_socket(app, service, follower, inference_lock):
-    manager = LiveSocketManager(service, follower, inference_lock)
+def register_live_socket(app, service, transcriber, corpus, inference_lock, *, tracker_factory=None):
+    manager = LiveSocketManager(service, transcriber, corpus, inference_lock, tracker_factory)
     app.extensions["live_socket_manager"] = manager
     app.config["SOCK_SERVER_OPTIONS"] = {"max_message_size": MAX_MESSAGE, "ping_interval": 10}
 

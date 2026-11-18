@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>بازشنوی گزارش خواننده | هم‌خوان</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    main{max-width:46rem;margin:clamp(1rem,5vw,4rem) auto;padding:0 1.25rem}
+    header{margin-bottom:1.5rem}h1{font-size:1.7rem;margin:0}
+    h2{font-size:1rem;margin:0 0 .4rem}p{margin:.3rem 0}
+    section{padding:1.2rem 0;border-top:1px solid var(--line)}
+    label,summary{font-weight:650}label{display:block}
+    input[type=file]{width:100%;max-width:100%;margin:.5rem 0}
+    input::file-selector-button{font:inherit;color:var(--ink);padding:.5rem .9rem;border:1px solid var(--line);border-radius:8px;background:var(--white);cursor:pointer}
+    audio{display:block;width:100%;margin:.8rem 0}summary{cursor:pointer}
+    mark{color:var(--ink);background:#e2ebd5;border-bottom:2px solid #718047}
+    [lang=ar]{font:1.6rem/1.9 Amiri,serif;white-space:pre-wrap;overflow-wrap:anywhere}
+    #issue-note-text{white-space:pre-wrap;overflow-wrap:anywhere}#view-error{color:#8b3128}
+    li{margin:.6rem 0}#history-list{padding-inline-start:1.5rem}
+  </style>
+  <script defer src="issue-review.js"></script>
+</head>
+<body>
+  <main>
+    <header><h1>بازشنوی گزارش خواننده</h1>
+      <p>فایل گزارش هم‌خوان را انتخاب کنید تا صدای همان بخش و تغییرات رونویسی را کنار هم مرور کنید.</p></header>
+    <section><label for="issue-file">فایل گزارش (JSON)</label>
+      <input type="file" id="issue-file" accept=".json,application/json">
+      <p>فایل فقط در همین مرورگر باز می‌شود.</p>
+      <p id="view-error" role="alert"></p></section>
+    <div id="view-result" hidden>
+      <section><h2>صدای گزارش‌شده</h2><p id="issue-range"></p>
+        <audio id="issue-audio" controls preload="metadata" aria-label="صدای بخش گزارش‌شده"></audio></section>
+      <section id="view-note" hidden><h2>یادداشت خواننده</h2><p dir="auto" id="issue-note-text"></p></section>
+      <section><h2>آخرین متنی که خواننده دید</h2><p id="view-target"></p><p id="view-final" lang="ar"></p>
+        <ul id="view-feedback"></ul></section>
+      <section><details id="view-history"><summary>تغییرات رونویسی همین بخش</summary>
+        <p id="view-history-status"></p><ol id="history-list"></ol></details></section>
+    </div>
+  </main>
+</body>
+</html>

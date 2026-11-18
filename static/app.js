@@ -1,5 +1,6 @@
 "use strict";
-const verses = JSON.parse(document.getElementById("verse-data").textContent);
+let verses = JSON.parse(document.getElementById("verse-data").textContent);
+let surah = 1, surahCount = 7, surahs = [], verseRequest = 0;
 const ready = document.body.dataset.ready === "true";
 const $ = (id) => document.getElementById(id);
 const fa = (value) => String(value).replace(/\d/g, (d) => "۰۱۲۳۴۵۶۷۸۹"[d]);
@@ -12,9 +13,10 @@ function setPhase(next) {
   phase = next;
   const locked = next !== "idle";
   document.querySelectorAll(".verse-button").forEach((b) => b.disabled = locked);
+  $("precise-surah").disabled = locked; $("precise-ayah").disabled = locked;
   $("audio-file").disabled = locked || !ready;
   $("upload-zone").classList.toggle("disabled", locked || !ready);
-  $("record-button").disabled = !ready || next === "processing" || next === "permission";
+  $("record-button").disabled = !ready || next === "processing" || next === "permission" || next === "loading";
   $("record-button").classList.toggle("recording", next === "recording");
   $("record-button").setAttribute("aria-label", next === "recording" ? "توقف ضبط" : "شروع ضبط");
   $("analyze-button").disabled = !ready || locked || !audioFile;
@@ -27,7 +29,9 @@ function setPhase(next) {
 function renderVerse(flagged = []) {
   const container = $("verse-text");
   container.replaceChildren();
-  verses[ayah - 1].words.forEach((word, i) => {
+  const selected = verses.find(verse => verse.ayah === ayah);
+  if (!selected) return;
+  selected.words.forEach((word, i) => {
     const span = document.createElement("span");
     span.textContent = word;
     span.className = "word" + (flagged.includes(i) ? " flagged" : "");
@@ -49,20 +53,52 @@ function clearAudio() {
   $("file-label").append(small);
   $("record-time").textContent = "۰۰:۰۰";
 }
-function selectAyah(number) {
-  if (phase !== "idle") return;
-  ayah = number;
-  clearAudio(); message(""); renderVerse();
-  $("result-panel").hidden = true;
-  $("ayah-label").textContent = `آیهٔ ${fa(ayah)} از ۷`;
-  document.querySelectorAll(".verse-button").forEach((b) => {
-    const selected = Number(b.dataset.ayah) === ayah;
-    b.classList.toggle("selected", selected); b.setAttribute("aria-current", String(selected));
+function paintVerseSelection() {
+  $("ayah-label").textContent = `آیهٔ ${fa(ayah)} از ${fa(surahCount)}`;
+  $("precise-ayah").value = String(ayah);
+  $("verse-nav").replaceChildren();
+  verses.forEach(verse => {
+    const button = document.createElement("button"); button.className = "verse-button";
+    const selected = verse.ayah === ayah; button.classList.toggle("selected",selected); button.setAttribute("aria-current",String(selected));
+    button.dataset.ayah = String(verse.ayah);
+    const number = document.createElement("span"); number.className = "verse-number"; number.textContent = fa(verse.ayah);
+    const preview = document.createElement("span"); preview.className = "verse-preview"; preview.lang = "ar"; preview.textContent = verse.text;
+    button.append(number,preview); button.addEventListener("click",()=>void selectAyah(verse.ayah)); $("verse-nav").append(button);
   });
-  [...$("progress-dots").children].forEach((d, i) => d.classList.toggle("active", i + 1 === ayah));
-  $("record-label").textContent = "برای شروع ضبط کلیک کنید";
-  $("record-detail").textContent = "اجازهٔ دسترسی به میکروفن را تأیید کنید.";
-  setPhase("idle");
+  $("next-button").hidden = ayah >= surahCount;
+}
+async function selectAyah(number, chosenSurah = surah) {
+  if (phase !== "idle") return;
+  const request = ++verseRequest;
+  message(""); setPhase("loading");
+  try {
+    const start = Math.max(1, number-2);
+    const response = await fetch(`/api/quran/ayahs?surah=${chosenSurah}&start=${start}&limit=5`);
+    if (!response.ok) throw new Error(); const result = await response.json();
+    if (request !== verseRequest) return;
+    if (!Array.isArray(result.ayahs) || !result.ayahs.some(verse=>verse.ayah===number)) throw new Error();
+    clearAudio(); $("result-panel").hidden = true;
+    surah = chosenSurah; ayah = number; verses = result.ayahs; surahCount = result.total;
+    const metadata = surahs.find(item=>item.surah===surah);
+    $("precise-surah-number").textContent = `سورهٔ ${fa(surah)}`;
+    $("precise-surah-name").textContent = metadata?.name || `سورهٔ ${fa(surah)}`;
+    $("precise-ayah-count").textContent = fa(surahCount);
+    $("precise-ayah").replaceChildren();
+    for (let index=1; index<=surahCount; index++) { const option=document.createElement("option"); option.value=String(index); option.textContent=fa(index); $("precise-ayah").append(option); }
+    renderVerse(); paintVerseSelection();
+    $("record-label").textContent = "برای شروع ضبط کلیک کنید";
+    $("record-detail").textContent = "اجازهٔ دسترسی به میکروفن را تأیید کنید.";
+  } catch { if (request===verseRequest) { message("دریافت آیه ممکن نشد؛ انتخاب قبلی حفظ شد. دوباره انتخاب کنید."); $("precise-surah").value=String(surah); $("precise-ayah").value=String(ayah); } }
+  finally { if (request === verseRequest) setPhase("idle"); }
+}
+async function loadCatalogue() {
+  try {
+    const response=await fetch('/api/quran/surahs'); if (!response.ok) throw new Error();
+    const result=await response.json(); if (!Array.isArray(result.surahs)) throw new Error(); surahs=result.surahs;
+    $("precise-surah").replaceChildren();
+    surahs.forEach(item=>{ const option=document.createElement('option'); option.value=String(item.surah); option.textContent=`${fa(item.surah)} · ${item.name}`; $("precise-surah").append(option); });
+    $("precise-catalogue-status").textContent = "۱۱۴ سوره · روایت حفص";
+  } catch { $("precise-catalogue-status").textContent = "فهرست سوره‌ها دریافت نشد؛ صفحه را تازه کنید."; }
 }
 function setAudio(file) {
   clearAudio(); message("");
@@ -159,20 +195,21 @@ function showResult(result) {
     group.messages.forEach((text) => { const p = document.createElement("p"); p.textContent = text; section.append(p); });
     $("result-errors").append(section);
   });
-  $("next-button").hidden = ayah === 7;
+  $("next-button").hidden = ayah >= surahCount;
   $("result-panel").hidden = false;
   $("result-panel").scrollIntoView({behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "instant" : "smooth", block: "nearest"});
 }
 $("record-button").addEventListener("click", () => phase === "recording" ? stopRecording() : startRecording());
 $("cancel-mic").addEventListener("click", () => cancelMicRequest());
 $("audio-file").addEventListener("change", (event) => { const file = event.target.files[0]; if (file) setAudio(file); });
-document.querySelectorAll(".verse-button").forEach((b) => b.addEventListener("click", () => selectAyah(Number(b.dataset.ayah))));
+$("precise-surah").addEventListener("change",()=>void selectAyah(1,Number($("precise-surah").value)));
+$("precise-ayah").addEventListener("change",()=>void selectAyah(Number($("precise-ayah").value)));
 $("retry-button").addEventListener("click", () => { selectAyah(ayah); $("record-button").focus(); });
-$("next-button").addEventListener("click", () => { if (ayah < 7) selectAyah(ayah + 1); });
+$("next-button").addEventListener("click", () => { if (ayah < surahCount) void selectAyah(ayah + 1); });
 $("analyze-button").addEventListener("click", async () => {
   if (!audioFile || phase !== "idle") return;
   message(""); setPhase("processing"); $("audio-player").pause(); $("result-panel").hidden = true;
-  const data = new FormData(); data.append("audio", audioFile); data.append("ayah", String(ayah)); data.append("surah", "1");
+  const data = new FormData(); data.append("audio", audioFile); data.append("ayah", String(ayah)); data.append("surah", String(surah));
   try {
     const response = await fetch("/analyze", {method: "POST", body: data});
     const result = await response.json();
@@ -182,4 +219,4 @@ $("analyze-button").addEventListener("click", async () => {
   finally { setPhase("idle"); }
 });
 window.addEventListener("pagehide", () => { micRequest += 1; clearTimeout(permissionTimer); cleanupStream(); if (previewUrl) URL.revokeObjectURL(previewUrl); });
-renderVerse(); setPhase("idle");
+renderVerse(); paintVerseSelection(); setPhase("idle"); void loadCatalogue();

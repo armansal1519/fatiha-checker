@@ -7,6 +7,7 @@ import numpy as np
 SAMPLE_RATE = 16000
 MAX_SECONDS = 30
 MAX_BYTES = 10 * 1024 * 1024
+MIN_AUDIO_RMS = 0.0001
 ALLOWED_EXTENSIONS = {"wav", "mp3", "m4a", "mp4", "webm", "ogg"}
 
 
@@ -52,6 +53,6 @@ def decode_audio(data: bytes, filename: str) -> np.ndarray:
     if not np.isfinite(wave).all():
         raise AudioError("دادهٔ صوتی معتبر نیست. دوباره ضبط کنید.")
     # Reject near-silence, not quiet speech. This is not a speech/noise classifier.
-    if float(np.sqrt(np.mean(wave.astype(np.float64) ** 2))) < 0.0001:
+    if float(np.sqrt(np.mean(wave.astype(np.float64) ** 2))) < MIN_AUDIO_RMS:
         raise AudioError("صدای قابل‌شنیدن دریافت نشد. میکروفن را بررسی و دوباره ضبط کنید.")
     return wave

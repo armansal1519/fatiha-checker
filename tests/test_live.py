@@ -95,7 +95,8 @@ def send(client, **fields):
 
 def test_live_page_and_api(live_client):
     page = live_client.get("/live")
-    assert page.status_code == 200 and page.text.count('class="live-word"') == 29
+    assert page.status_code == 200 and page.text.count('class="live-word"') == 0
+    assert 'id="heard-transcript"' in page.text
     for filename in ["live.js", "live.css", "live-audio.js", "live-cadence.js", "pcm-worklet.js"]:
         assert live_client.get("/static/" + filename).status_code == 200
     result = send(live_client)

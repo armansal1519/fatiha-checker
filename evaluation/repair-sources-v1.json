@@ -1,0 +1,78 @@
+{
+  "reader_catalog": "https://www.mp3quran.net/api/v3/ayat_timing/reads",
+  "learner_revision": "d196cd3132c69cd361d28cf6a8b442ae4e0bf0b4",
+  "readers": [
+    {
+      "id": 3,
+      "name": "إبراهيم العسيري",
+      "folder_url": "https://cdn.mp3quran.net/audio/ibrahim-asiri/r1/"
+    },
+    {
+      "id": 6,
+      "name": "أحمد الحواشي",
+      "folder_url": "https://cdn.mp3quran.net/audio/ahmad-hawashi/r1/"
+    },
+    {
+      "id": 8,
+      "name": "أحمد صابر",
+      "folder_url": "https://cdn.mp3quran.net/audio/ahmad-saber/r1/"
+    },
+    {
+      "id": 9,
+      "name": "أحمد نعينع",
+      "folder_url": "https://cdn.mp3quran.net/audio/ahmad-naina/r1/"
+    },
+    {
+      "id": 10,
+      "name": "أكرم العلاقمي",
+      "folder_url": "https://cdn.mp3quran.net/audio/akram-alaqmi/r1/"
+    }
+  ],
+  "learners": [
+    {
+      "recording_id": "d6468d6f-421b-4bfb-b53c-465a9a1c50ee",
+      "file_name": "temp_audio_chunks/chunks_recording_d6468d6f-421b-4bfb-b53c-465a9a1c50ee/chunk5.wav",
+      "riwayah": "Hafs",
+      "surah": "85",
+      "ayah": "19",
+      "text": "بل الذين كفروا في تكذيب",
+      "errors": {}
+    },
+    {
+      "recording_id": "bb73daed-eaa9-4874-8e5c-e836f311f819",
+      "file_name": "temp_audio_chunks/chunks_recording_bb73daed-eaa9-4874-8e5c-e836f311f819/chunk6.wav",
+      "riwayah": "Hafs",
+      "surah": "1",
+      "ayah": "7",
+      "text": "صراط الذين أنعمت عليهم غير المغضوب عليهم ولا الضالين",
+      "errors": {}
+    },
+    {
+      "recording_id": "6ef01da8-ee23-4053-bdea-7bff40ffcf9f",
+      "file_name": "temp_audio_chunks/chunks_recording_6ef01da8-ee23-4053-bdea-7bff40ffcf9f/chunk14.wav",
+      "riwayah": "Hafs",
+      "surah": "84",
+      "ayah": "25",
+      "text": "إلا الذين آمنوا وعملوا الصالحات لهم أجر غير ممنون",
+      "errors": {}
+    },
+    {
+      "recording_id": "3478e087-ee20-46dd-a4f6-16218e201bd6",
+      "file_name": "temp_audio_chunks/chunks_recording_3478e087-ee20-46dd-a4f6-16218e201bd6/chunk2.wav",
+      "riwayah": "Hafs",
+      "surah": "89",
+      "ayah": "4",
+      "text": "والليل إذا يسر",
+      "errors": {}
+    },
+    {
+      "recording_id": "6079251c-c320-4f32-b564-e658ce64edc6",
+      "file_name": "temp_audio_chunks/chunks_recording_6079251c-c320-4f32-b564-e658ce64edc6/chunk9.wav",
+      "riwayah": "Hafs",
+      "surah": "80",
+      "ayah": "14",
+      "text": "مرفوعة مطهرة",
+      "errors": {}
+    }
+  ]
+}

@@ -1,4 +1,4 @@
-// Version 1: sequential PCM, never replace lost audio with stitched fragments.
+// Version 2 JSON; the ordered PCM packet remains unchanged.
 export function pcmPacket(samples, sequence, offset) {
   const buffer = new ArrayBuffer(8 + samples.length * 2), view = new DataView(buffer);
   view.setUint32(0, sequence, true); view.setUint32(4, offset, true);
@@ -16,7 +16,7 @@ export class LiveConnection {
     this.ackSequence = -1; this.pending = new Map();
     this.finished = false; this.intentionalClose = false; this.failed = false; this.revision = -1;
   }
-  async connect({sampleRate, startAyah}, signal) {
+  async connect({sampleRate, startSurah = null, startAyah = null}, signal) {
     this.rate = sampleRate;
     const url = new URL('/live/ws', window.location.href);
     url.protocol = url.protocol === 'https:' ? 'wss:' : 'ws:';
@@ -25,7 +25,7 @@ export class LiveConnection {
     const ready = new Promise((resolve, reject) => { this.resolveReady = resolve; this.rejectReady = reject; });
     this.openTimeout = setTimeout(() => this.fail('ارتباط زنده برقرار نشد؛ اجرای برنامه را بررسی کنید.'),10000);
     this.socket.onopen = () => {
-      if (!this.intentionalClose && !this.failed) this.socket.send(JSON.stringify({type:'start',version:1,start_ayah:startAyah,sample_rate:sampleRate,channels:1}));
+      if (!this.intentionalClose && !this.failed) this.socket.send(JSON.stringify({type:'start',version:2,start_surah:startSurah,start_ayah:startAyah,sample_rate:sampleRate,channels:1}));
     };
     this.socket.onmessage = ({data}) => {
       if (this.intentionalClose || this.failed || this.finished) return;
@@ -34,7 +34,7 @@ export class LiveConnection {
       if (!event || typeof event !== 'object') { this.fail('پاسخ برنامه معتبر نیست.'); return; }
       if (event.type === 'ready') {
         if (this.session) return;
-        if (event.version !== 1 || typeof event.session_id !== 'string') { this.fail('نسخهٔ ارتباط زنده سازگار نیست؛ صفحه را تازه کنید.'); return; }
+        if (event.version !== 2 || typeof event.session_id !== 'string') { this.fail('نسخهٔ ارتباط زنده سازگار نیست؛ صفحه را تازه کنید.'); return; }
         this.session = event.session_id; clearTimeout(this.openTimeout); this.resolveReady();
       } else if (event.type === 'error') {
         if (this.session && event.session_id !== this.session) return;
@@ -76,6 +76,11 @@ export class LiveConnection {
     this.socket.send(pcmPacket(samples,this.sequence,this.total));
     this.total += samples.length; this.sequence++;
   }
+  setReference(surah, ayah) {
+    if (!this.session || this.socket.readyState !== 1 || this.failed || this.finished || this.intentionalClose || this.donePromise) throw new Error('ارتباط زنده آماده نیست.');
+    if (!Number.isInteger(surah) || !Number.isInteger(ayah)) throw new Error('شمارهٔ سوره و آیه معتبر نیست.');
+    this.socket.send(JSON.stringify({type:'reference',surah,ayah}));
+  }
   finish() {
     if (this.finished) return Promise.resolve();
     if (this.donePromise) return this.donePromise;
@@ -84,7 +89,7 @@ export class LiveConnection {
       this.rejectDone(new Error('ارتباط برای بررسی پایانی در دسترس نیست.'));
     } else {
       this.socket.send(JSON.stringify({type:'stop',last_sequence:this.sequence-1,total_samples:this.total}));
-      this.finishTimeout = setTimeout(() => this.fail('بررسی پایانی بیش از حد طول کشید؛ دوباره تلاش کنید.'),25000);
+      this.finishTimeout = setTimeout(() => this.fail('بررسی پایانی بیش از حد طول کشید؛ دوباره تلاش کنید.'),60000);
     }
     return this.donePromise;
   }

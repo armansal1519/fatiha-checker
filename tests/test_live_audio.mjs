@@ -47,3 +47,14 @@ test('snapshot bounds work across partial blocks and clamp to retained audio', a
   const empty = new DataView(await ring.wav({endTotal:0}).arrayBuffer());
   assert.equal(empty.getUint32(40,true),0);
 });
+
+test('live file limit is100MiB and duration limit is thirty minutes',async t=>{
+  const {readAudioFile}=await import(`data:text/javascript;base64,${Buffer.from(code).toString('base64')}`);
+  const old=globalThis.OfflineAudioContext; t.after(()=>{if(old) globalThis.OfflineAudioContext=old; else delete globalThis.OfflineAudioContext;});
+  let duration=1800;
+  globalThis.OfflineAudioContext=class {async decodeAudioData(){return {duration,length:16,numberOfChannels:1,sampleRate:16000,getChannelData:()=>new Float32Array(16)};}};
+  const file={size:100*1024*1024,arrayBuffer:async()=>new ArrayBuffer(1)};
+  assert.equal((await readAudioFile(file)).samples.length,16);
+  await assert.rejects(readAudioFile({...file,size:file.size+1}));
+  duration=1800.1; await assert.rejects(readAudioFile(file));
+});

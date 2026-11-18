@@ -14,7 +14,7 @@ configure_cache()
 import Levenshtein
 from quran_transcript import Aya, MoshafAttributes, chunck_phonemes, explain_error, quran_phonetizer
 
-SUPPORTED_SURAHS = (1,)
+SUPPORTED_SURAHS = tuple(range(1, 115))
 VOWELS = {"َ": "فتحه", "ِ": "کسره", "ُ": "ضمه"}
 LONG_VOWELS = "اۦۥ"
 MOSHAF = MoshafAttributes(rewaya="hafs", madd_monfasel_len=2, madd_mottasel_len=4,
@@ -28,14 +28,15 @@ class Reference:
     phonetic: object
     words: list[str]
     word_spans: list[tuple[int, int]]
+    surah: int = 1
 
 
-def make_reference(ayah: int, text: str | None = None) -> Reference:
-    text = text if text is not None else Aya(1, ayah).get().uthmani
+def make_reference(ayah: int, text: str | None = None, *, surah: int = 1) -> Reference:
+    text = text if text is not None else Aya(surah, ayah).get().uthmani
     # quran_phonetizer applies its end-of-segment waqf operations automatically.
     phonetic = quran_phonetizer(text, MOSHAF, remove_spaces=True)
     matches = list(re.finditer(r"\S+", text))
-    return Reference(ayah, text, phonetic, [m.group() for m in matches], [m.span() for m in matches])
+    return Reference(ayah, text, phonetic, [m.group() for m in matches], [m.span() for m in matches], surah)
 
 
 def basic_form(group: str) -> str:
@@ -128,11 +129,17 @@ def compare_prediction(ref: Reference, predicted: str) -> list[dict]:
 
 class RecitationService:
     def __init__(self):
-        self.references = {i: make_reference(i) for i in range(1, 8)}
+        from quran_corpus import QuranCorpus
+        self.corpus = QuranCorpus()
+        self.references = {i: self.corpus.reference(1, i) for i in range(1, 8)}
         self.verses = [dict(ayah=i, text=r.text, words=r.words) for i, r in self.references.items()]
         self.ready = False
         self.model = None
         self._live_prediction = None
+        self.error = None
+
+    def reference(self, surah, ayah):
+        return self.corpus.reference(surah, ayah)
 
     def load(self):
         if self.ready:
@@ -148,9 +155,11 @@ class RecitationService:
             self.model = Muaalem(model_name_or_path=model_path, device="cpu", dtype=torch.float32)
             self.model.model.eval()
             self.ready = True
-            logging.info("Model ready. Open http://127.0.0.1:5000")
-        except Exception:
+            self.error = None
+            logging.info("Model ready.")
+        except Exception as exc:
             self.model = None
+            self.error = str(exc)
             logging.exception("Model could not be loaded. Check the download and installed dependencies.")
 
     def predict(self, wave, ref):
@@ -166,6 +175,14 @@ class RecitationService:
         Do not quantize, change precision, or change the phoneme decoding rule.
         Called only under the shared server inference lock.
         """
+        return self.predict_live_timed(wave)["text"]
+
+    def predict_live_timed(self, wave):
+        """Official phoneme text with approximate CTC-frame spans in window ms.
+
+        Keep the upstream greedy decoder's exact token sequence, including its
+        edge behavior. Timing never substitutes reference or orthographic text.
+        """
         if not self.ready:
             raise RuntimeError("Model is not ready")
         import torch
@@ -175,21 +192,59 @@ class RecitationService:
         # rules. Reuse its prediction, retaining only a digest and text, no audio.
         digest = blake2b(wave.tobytes(), digest_size=16).digest()
         if self._live_prediction and self._live_prediction[0] == digest:
-            return self._live_prediction[1]
+            cached = self._live_prediction[1]
+            return dict(text=cached["text"], groups=[dict(group) for group in cached["groups"]])
         with torch.inference_mode():
             features = self.model.processor([wave], sampling_rate=16000, return_tensors="pt")
             features = {k: v.to(self.model.device, dtype=self.model.dtype) for k, v in features.items()}
             logits = self.model.model(**features, return_dict=False)[0]["phonemes"]
             probs = logits.softmax(dim=-1).cpu().to(torch.float32)
-            predicted = phonemes_level_greedy_decode(
-                probs, self.model.multi_level_tokenizer.id_to_vocab["phonemes"])[0].text
-        self._live_prediction = digest, predicted
-        return predicted
+            vocab = self.model.multi_level_tokenizer.id_to_vocab["phonemes"]
+            unit = phonemes_level_greedy_decode(probs, vocab)[0]
+            # topk matches the official decoder's tie-breaking exactly.
+            frame_ids = probs.topk(1, dim=-1).indices[0, :, 0].tolist()
+        duration_ms = len(wave) * 1000 / 16000
+        runs = []
+        start = 0
+        for end in range(1, len(frame_ids) + 1):
+            if end == len(frame_ids) or frame_ids[end] != frame_ids[start]:
+                if frame_ids[start] != 0:
+                    runs.append((frame_ids[start], start, end))
+                start = end
+        # The official 0.2.2 decoder can omit a token after a final blank.
+        # Map only its returned ids, rather than "fixing" the transcript here.
+        char_times, run_index = [], 0
+        for token in unit.ids.tolist():
+            while run_index < len(runs) and runs[run_index][0] != token:
+                run_index += 1
+            if run_index == len(runs):
+                raise RuntimeError("Official phoneme output could not be mapped to CTC frames")
+            _, first, last = runs[run_index]
+            span = (round(first * duration_ms / len(frame_ids)),
+                    round(last * duration_ms / len(frame_ids)))
+            char_times.extend([span] * len(vocab[token]))
+            run_index += 1
+        groups, offset = [], 0
 
-    def analyze(self, wave, ayah):
-        ref = self.references[ayah]
+        def append_group(text, position):
+            if text:
+                spans = char_times[position:position + len(text)]
+                groups.append(dict(text=text, start_ms=spans[0][0], end_ms=spans[-1][1]))
+
+        for group in chunck_phonemes(unit.text):
+            position = unit.text.find(group, offset)
+            append_group(unit.text[offset:position], offset)
+            append_group(group, position)
+            offset = position + len(group)
+        append_group(unit.text[offset:], offset)
+        result = dict(text=unit.text, groups=groups)
+        self._live_prediction = digest, result
+        return dict(text=result["text"], groups=[dict(group) for group in groups])
+
+    def analyze(self, wave, ayah, surah=1):
+        ref = self.reference(surah, ayah)
         predicted = self.predict(wave, ref)
-        base_result = dict(surah=1, ayah=ayah, errors=[])
+        base_result = dict(surah=surah, ayah=ayah, errors=[])
         if not predicted.strip():
             return dict(base_result, status="needs_retry", message="خواندن آیه تشخیص داده نشد. در محیطی آرام دوباره ضبط کنید.")
         # Gross mismatch is a retry, not dozens of purported pronunciation errors.

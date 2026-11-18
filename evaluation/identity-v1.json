@@ -1,0 +1,270 @@
+{
+ "schema_version": 1,
+ "reason": "Clean sibling for each controlled ayah, chosen before replaying controls.",
+ "clips": [
+  {
+   "id": "control-96-1-identity",
+   "source_kind": "controlled-edit-human",
+   "group": "word-assets-96-1",
+   "split": "dev",
+   "surah": 96,
+   "ayah": 1,
+   "canonical_text": "اقْرَأْ بِاسْمِ رَبِّكَ الَّذِي خَلَقَ",
+   "label_scope": "exact_by_construction",
+   "operation": "identity",
+   "source": {
+    "provider": "Quran.com word-by-word recordings",
+    "metadata_url": "https://api.quran.com/api/v4/verses/by_key/96:1?words=true&word_fields=text_uthmani",
+    "terms_url": "https://quran.com/terms-and-conditions",
+    "license": "Source retains rights; local QA samples only."
+   },
+   "audio": "audio/control-96-1-identity.wav",
+   "spoken_text": null,
+   "spoken_text_verified": false,
+   "error_labels_complete": false,
+   "error_spoken_word_indices": null
+  },
+  {
+   "id": "control-104-2-identity",
+   "source_kind": "controlled-edit-human",
+   "group": "word-assets-104-2",
+   "split": "dev",
+   "surah": 104,
+   "ayah": 2,
+   "canonical_text": "الَّذِي جَمَعَ مَالًا وَعَدَّدَهُ",
+   "label_scope": "exact_by_construction",
+   "operation": "identity",
+   "source": {
+    "provider": "Quran.com word-by-word recordings",
+    "metadata_url": "https://api.quran.com/api/v4/verses/by_key/104:2?words=true&word_fields=text_uthmani",
+    "terms_url": "https://quran.com/terms-and-conditions",
+    "license": "Source retains rights; local QA samples only."
+   },
+   "audio": "audio/control-104-2-identity.wav",
+   "spoken_text": null,
+   "spoken_text_verified": false,
+   "error_labels_complete": false,
+   "error_spoken_word_indices": null
+  },
+  {
+   "id": "control-105-1-identity",
+   "source_kind": "controlled-edit-human",
+   "group": "word-assets-105-1",
+   "split": "dev",
+   "surah": 105,
+   "ayah": 1,
+   "canonical_text": "أَلَمْ تَرَ كَيْفَ فَعَلَ رَبُّكَ بِأَصْحَابِ الْفِيلِ",
+   "label_scope": "exact_by_construction",
+   "operation": "identity",
+   "source": {
+    "provider": "Quran.com word-by-word recordings",
+    "metadata_url": "https://api.quran.com/api/v4/verses/by_key/105:1?words=true&word_fields=text_uthmani",
+    "terms_url": "https://quran.com/terms-and-conditions",
+    "license": "Source retains rights; local QA samples only."
+   },
+   "audio": "audio/control-105-1-identity.wav",
+   "spoken_text": null,
+   "spoken_text_verified": false,
+   "error_labels_complete": false,
+   "error_spoken_word_indices": null
+  },
+  {
+   "id": "control-105-3-identity",
+   "source_kind": "controlled-edit-human",
+   "group": "word-assets-105-3",
+   "split": "dev",
+   "surah": 105,
+   "ayah": 3,
+   "canonical_text": "وَأَرْسَلَ عَلَيْهِمْ طَيْرًا أَبَابِيلَ",
+   "label_scope": "exact_by_construction",
+   "operation": "identity",
+   "source": {
+    "provider": "Quran.com word-by-word recordings",
+    "metadata_url": "https://api.quran.com/api/v4/verses/by_key/105:3?words=true&word_fields=text_uthmani",
+    "terms_url": "https://quran.com/terms-and-conditions",
+    "license": "Source retains rights; local QA samples only."
+   },
+   "audio": "audio/control-105-3-identity.wav",
+   "spoken_text": null,
+   "spoken_text_verified": false,
+   "error_labels_complete": false,
+   "error_spoken_word_indices": null
+  },
+  {
+   "id": "control-106-3-identity",
+   "source_kind": "controlled-edit-human",
+   "group": "word-assets-106-3",
+   "split": "dev",
+   "surah": 106,
+   "ayah": 3,
+   "canonical_text": "فَلْيَعْبُدُوا رَبَّ هَٰذَا الْبَيْتِ",
+   "label_scope": "exact_by_construction",
+   "operation": "identity",
+   "source": {
+    "provider": "Quran.com word-by-word recordings",
+    "metadata_url": "https://api.quran.com/api/v4/verses/by_key/106:3?words=true&word_fields=text_uthmani",
+    "terms_url": "https://quran.com/terms-and-conditions",
+    "license": "Source retains rights; local QA samples only."
+   },
+   "audio": "audio/control-106-3-identity.wav",
+   "spoken_text": null,
+   "spoken_text_verified": false,
+   "error_labels_complete": false,
+   "error_spoken_word_indices": null
+  },
+  {
+   "id": "control-106-4-identity",
+   "source_kind": "controlled-edit-human",
+   "group": "word-assets-106-4",
+   "split": "dev",
+   "surah": 106,
+   "ayah": 4,
+   "canonical_text": "الَّذِي أَطْعَمَهُم مِّن جُوعٍ وَآمَنَهُم مِّنْ خَوْفٍ",
+   "label_scope": "exact_by_construction",
+   "operation": "identity",
+   "source": {
+    "provider": "Quran.com word-by-word recordings",
+    "metadata_url": "https://api.quran.com/api/v4/verses/by_key/106:4?words=true&word_fields=text_uthmani",
+    "terms_url": "https://quran.com/terms-and-conditions",
+    "license": "Source retains rights; local QA samples only."
+   },
+   "audio": "audio/control-106-4-identity.wav",
+   "spoken_text": null,
+   "spoken_text_verified": false,
+   "error_labels_complete": false,
+   "error_spoken_word_indices": null
+  },
+  {
+   "id": "control-107-2-identity",
+   "source_kind": "controlled-edit-human",
+   "group": "word-assets-107-2",
+   "split": "holdout",
+   "surah": 107,
+   "ayah": 2,
+   "canonical_text": "فَذَٰلِكَ الَّذِي يَدُعُّ الْيَتِيمَ",
+   "label_scope": "exact_by_construction",
+   "operation": "identity",
+   "source": {
+    "provider": "Quran.com word-by-word recordings",
+    "metadata_url": "https://api.quran.com/api/v4/verses/by_key/107:2?words=true&word_fields=text_uthmani",
+    "terms_url": "https://quran.com/terms-and-conditions",
+    "license": "Source retains rights; local QA samples only."
+   },
+   "audio": "audio/control-107-2-identity.wav",
+   "spoken_text": null,
+   "spoken_text_verified": false,
+   "error_labels_complete": false,
+   "error_spoken_word_indices": null
+  },
+  {
+   "id": "control-107-3-identity",
+   "source_kind": "controlled-edit-human",
+   "group": "word-assets-107-3",
+   "split": "holdout",
+   "surah": 107,
+   "ayah": 3,
+   "canonical_text": "وَلَا يَحُضُّ عَلَىٰ طَعَامِ الْمِسْكِينِ",
+   "label_scope": "exact_by_construction",
+   "operation": "identity",
+   "source": {
+    "provider": "Quran.com word-by-word recordings",
+    "metadata_url": "https://api.quran.com/api/v4/verses/by_key/107:3?words=true&word_fields=text_uthmani",
+    "terms_url": "https://quran.com/terms-and-conditions",
+    "license": "Source retains rights; local QA samples only."
+   },
+   "audio": "audio/control-107-3-identity.wav",
+   "spoken_text": null,
+   "spoken_text_verified": false,
+   "error_labels_complete": false,
+   "error_spoken_word_indices": null
+  },
+  {
+   "id": "control-110-2-identity",
+   "source_kind": "controlled-edit-human",
+   "group": "word-assets-110-2",
+   "split": "holdout",
+   "surah": 110,
+   "ayah": 2,
+   "canonical_text": "وَرَأَيْتَ النَّاسَ يَدْخُلُونَ فِي دِينِ اللَّهِ أَفْوَاجًا",
+   "label_scope": "exact_by_construction",
+   "operation": "identity",
+   "source": {
+    "provider": "Quran.com word-by-word recordings",
+    "metadata_url": "https://api.quran.com/api/v4/verses/by_key/110:2?words=true&word_fields=text_uthmani",
+    "terms_url": "https://quran.com/terms-and-conditions",
+    "license": "Source retains rights; local QA samples only."
+   },
+   "audio": "audio/control-110-2-identity.wav",
+   "spoken_text": null,
+   "spoken_text_verified": false,
+   "error_labels_complete": false,
+   "error_spoken_word_indices": null
+  },
+  {
+   "id": "control-111-1-identity",
+   "source_kind": "controlled-edit-human",
+   "group": "word-assets-111-1",
+   "split": "holdout",
+   "surah": 111,
+   "ayah": 1,
+   "canonical_text": "تَبَّتْ يَدَا أَبِي لَهَبٍ وَتَبَّ",
+   "label_scope": "exact_by_construction",
+   "operation": "identity",
+   "source": {
+    "provider": "Quran.com word-by-word recordings",
+    "metadata_url": "https://api.quran.com/api/v4/verses/by_key/111:1?words=true&word_fields=text_uthmani",
+    "terms_url": "https://quran.com/terms-and-conditions",
+    "license": "Source retains rights; local QA samples only."
+   },
+   "audio": "audio/control-111-1-identity.wav",
+   "spoken_text": null,
+   "spoken_text_verified": false,
+   "error_labels_complete": false,
+   "error_spoken_word_indices": null
+  },
+  {
+   "id": "control-113-3-identity",
+   "source_kind": "controlled-edit-human",
+   "group": "word-assets-113-3",
+   "split": "holdout",
+   "surah": 113,
+   "ayah": 3,
+   "canonical_text": "وَمِن شَرِّ غَاسِقٍ إِذَا وَقَبَ",
+   "label_scope": "exact_by_construction",
+   "operation": "identity",
+   "source": {
+    "provider": "Quran.com word-by-word recordings",
+    "metadata_url": "https://api.quran.com/api/v4/verses/by_key/113:3?words=true&word_fields=text_uthmani",
+    "terms_url": "https://quran.com/terms-and-conditions",
+    "license": "Source retains rights; local QA samples only."
+   },
+   "audio": "audio/control-113-3-identity.wav",
+   "spoken_text": null,
+   "spoken_text_verified": false,
+   "error_labels_complete": false,
+   "error_spoken_word_indices": null
+  },
+  {
+   "id": "control-114-4-identity",
+   "source_kind": "controlled-edit-human",
+   "group": "word-assets-114-4",
+   "split": "holdout",
+   "surah": 114,
+   "ayah": 4,
+   "canonical_text": "مِن شَرِّ الْوَسْوَاسِ الْخَنَّاسِ",
+   "label_scope": "exact_by_construction",
+   "operation": "identity",
+   "source": {
+    "provider": "Quran.com word-by-word recordings",
+    "metadata_url": "https://api.quran.com/api/v4/verses/by_key/114:4?words=true&word_fields=text_uthmani",
+    "terms_url": "https://quran.com/terms-and-conditions",
+    "license": "Source retains rights; local QA samples only."
+   },
+   "audio": "audio/control-114-4-identity.wav",
+   "spoken_text": null,
+   "spoken_text_verified": false,
+   "error_labels_complete": false,
+   "error_spoken_word_indices": null
+  }
+ ]
+}

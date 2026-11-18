@@ -1,0 +1,1021 @@
+{
+ "schema_version": 1,
+ "complete": true,
+ "source_annotation_dataset": "https://huggingface.co/datasets/QUD-Technologies/quran-alignment-benchmark",
+ "source_revision": "76c3d804d082c3cc189601faf13a41996e17b6dc",
+ "annotator": "QUD Technologies",
+ "annotation_license": "CC BY 4.0",
+ "source_manifest": "https://github.com/QUD-Technologies/quran-alignment-benchmark/blob/33716c28f4f7aa15d76911f1beb32e7d523ab8bd/tools/corpus_v1.json",
+ "annotation_adaptation": "Selected reviewed segment ranges and applied a local alignment offset verified against primary recordings. Quran word IDs are rendered using quran-transcript.",
+ "source_audio": {
+  "jaber-inshiqaq": {
+   "provider": "MP3Quran",
+   "audio_url": "https://cdn.mp3quran.net/audio/ali-jaber/r1/084.mp3",
+   "sha256": "0138a0508c678d1fd4592769e6908bf1437d8bab23ac2600ac7bc65db4929a7f",
+   "reciter": "Ali Jaber",
+   "publisher_terms": "https://apiquran.mp3quran.net/en/contact-us",
+   "catalog": "https://www.mp3quran.net/api/v3/reciters?language=eng"
+  },
+  "husary-fath": {
+   "provider": "MP3Quran",
+   "audio_url": "https://cdn.mp3quran.net/audio/mahmoud-husary/r2/048.mp3",
+   "sha256": "987af2095d7b1744f1d9ab1ac439c45f892b88ac888e2250bbc446b6e1dec688",
+   "reciter": "Mahmoud Khalil Al-Husary",
+   "publisher_terms": "https://apiquran.mp3quran.net/en/contact-us",
+   "catalog": "https://www.mp3quran.net/api/v3/reciters?language=eng"
+  },
+  "minshawi-luqman": {
+   "provider": "MP3Quran",
+   "audio_url": "https://cdn.mp3quran.net/audio/muhammad-minshawi/r3/031.mp3",
+   "sha256": "f48058e52bfee7d1020ce76d272156db5b04d336de5957afe1f728829dda9d28",
+   "reciter": "Muhammad Siddiq Al-Minshawi",
+   "publisher_terms": "https://apiquran.mp3quran.net/en/contact-us",
+   "catalog": "https://www.mp3quran.net/api/v3/reciters?language=eng"
+  }
+ },
+ "decisions": [
+  {
+   "id": "luhaidan-fatir",
+   "reciter": "Muhammad Al-Luhaidan",
+   "released_annotation_license": "CC BY 4.0",
+   "original_bucket_item": "01a0603a-bb7e-7b6b-9612-430b49ffbb28",
+   "decision": "not_included",
+   "reason": "Exact reviewed capture has no explicit audio grant in QUD v1 manifest or linked source item; no independently matched publisher recording in this pack."
+  },
+  {
+   "id": "luhaidan-haqqah",
+   "reciter": "Muhammad Al-Luhaidan",
+   "released_annotation_license": "CC BY 4.0",
+   "original_bucket_item": "01a0603b-d2b1-76eb-bf61-35aa4a9da8d9",
+   "decision": "not_included",
+   "reason": "Exact reviewed capture has no explicit audio grant in QUD v1 manifest or linked source item; no independently matched publisher recording in this pack."
+  },
+  {
+   "id": "luhaidan-qiyamah",
+   "reciter": "Muhammad Al-Luhaidan",
+   "released_annotation_license": "CC BY 4.0",
+   "original_bucket_item": "01a0603c-94aa-7864-bc22-bfa54d51be44",
+   "decision": "not_included",
+   "reason": "Exact reviewed capture has no explicit audio grant in QUD v1 manifest or linked source item; no independently matched publisher recording in this pack."
+  },
+  {
+   "id": "jaber-inshiqaq",
+   "reciter": "Ali Jaber",
+   "released_annotation_license": "CC BY 4.0",
+   "original_bucket_item": "01a06094-3376-7547-84c0-aad4402592a0",
+   "decision": "included using independently matched publisher recording",
+   "source_audio_url": "https://cdn.mp3quran.net/audio/ali-jaber/r1/084.mp3",
+   "annotation_author": "QUD Technologies"
+  },
+  {
+   "id": "jaber-nisa",
+   "reciter": "Ali Jaber",
+   "released_annotation_license": "CC BY 4.0",
+   "original_bucket_item": "01a06bbc-5a84-7e7a-bd37-dd944fb7b5b0",
+   "decision": "not_included",
+   "reason": "Exact reviewed capture has no explicit audio grant in QUD v1 manifest or linked source item; no independently matched publisher recording in this pack."
+  },
+  {
+   "id": "afasy-baqarah",
+   "reciter": "Mishary Al-Afasy",
+   "released_annotation_license": "CC BY 4.0",
+   "original_bucket_item": "01a06bfb-20cf-7e43-ad9c-b03a4e8f9d96",
+   "decision": "not_included",
+   "reason": "Exact reviewed capture has no explicit audio grant in QUD v1 manifest or linked source item; no independently matched publisher recording in this pack."
+  },
+  {
+   "id": "mandour-taha",
+   "reciter": "Ahmed Mandour",
+   "released_annotation_license": "CC BY 4.0",
+   "original_bucket_item": "01a07643-76cb-797b-a48c-f7ad473885c3",
+   "decision": "not_included",
+   "reason": "Exact reviewed capture has no explicit audio grant in QUD v1 manifest or linked source item; no independently matched publisher recording in this pack."
+  },
+  {
+   "id": "ayyub-juz-amma",
+   "reciter": "Muhammad Ayyub",
+   "released_annotation_license": "CC BY 4.0",
+   "original_bucket_item": "01a076b2-c4c7-751b-a5cc-05c9428fb237",
+   "decision": "not_included",
+   "reason": "Exact reviewed capture has no explicit audio grant in QUD v1 manifest or linked source item; no independently matched publisher recording in this pack."
+  },
+  {
+   "id": "badri-juz-tabarak",
+   "reciter": "Abdul Qadir Badri",
+   "released_annotation_license": "CC BY 4.0",
+   "original_bucket_item": "01a076b8-b859-7457-960f-d6564875b3ac",
+   "decision": "not_included",
+   "reason": "Exact reviewed capture has no explicit audio grant in QUD v1 manifest or linked source item; no independently matched publisher recording in this pack."
+  },
+  {
+   "id": "abdulbasit-raad",
+   "reciter": "Abdul Basit Abdul Samad",
+   "released_annotation_license": "CC BY 4.0",
+   "original_bucket_item": "01a076bd-bfb6-7b4a-bcaa-995948c9b0dc",
+   "decision": "not_included",
+   "reason": "Exact reviewed capture has no explicit audio grant in QUD v1 manifest or linked source item; no independently matched publisher recording in this pack."
+  },
+  {
+   "id": "diban-sad",
+   "reciter": "Ahmed Diban",
+   "released_annotation_license": "CC BY 4.0",
+   "original_bucket_item": "01a076c6-3fd7-7b0c-9e41-c0ad4436a936",
+   "decision": "not_included",
+   "reason": "Exact reviewed capture has no explicit audio grant in QUD v1 manifest or linked source item; no independently matched publisher recording in this pack."
+  },
+  {
+   "id": "husary-fath",
+   "reciter": "Mahmoud Khalil Al-Husary",
+   "released_annotation_license": "CC BY 4.0",
+   "original_bucket_item": "01a07704-c62c-70ef-95e1-73744b7cae87",
+   "decision": "included using independently matched publisher recording",
+   "source_audio_url": "https://cdn.mp3quran.net/audio/mahmoud-husary/r2/048.mp3",
+   "annotation_author": "QUD Technologies"
+  },
+  {
+   "id": "prayer-baqarah-yasin",
+   "reciter": "Adil Yusuf",
+   "released_annotation_license": "CC BY 4.0",
+   "original_bucket_item": "01a07710-1cbf-704a-be2e-74cc49098193",
+   "decision": "not_included",
+   "reason": "Exact reviewed capture has no explicit audio grant in QUD v1 manifest or linked source item; no independently matched publisher recording in this pack."
+  },
+  {
+   "id": "witr-muawwidhat",
+   "reciter": "Mishary Al-Afasy",
+   "released_annotation_license": "CC BY 4.0",
+   "original_bucket_item": "01a07710-bd02-7c29-9f4a-98c446589c9d",
+   "decision": "not_included",
+   "reason": "Exact reviewed capture has no explicit audio grant in QUD v1 manifest or linked source item; no independently matched publisher recording in this pack."
+  },
+  {
+   "id": "taraweeh-maryam",
+   "reciter": "Ibrahim Idris",
+   "released_annotation_license": "CC BY 4.0",
+   "original_bucket_item": "01a07711-5518-7f0f-a40f-01984e1c9cd1",
+   "decision": "not_included",
+   "reason": "Exact reviewed capture has no explicit audio grant in QUD v1 manifest or linked source item; no independently matched publisher recording in this pack."
+  },
+  {
+   "id": "minshawi-luqman",
+   "reciter": "Muhammad Siddiq Al-Minshawi",
+   "released_annotation_license": "CC BY 4.0",
+   "original_bucket_item": "01a07c87-b1a1-7e84-893c-043b4ea6b36e",
+   "decision": "included using independently matched publisher recording",
+   "source_audio_url": "https://cdn.mp3quran.net/audio/muhammad-minshawi/r3/031.mp3",
+   "annotation_author": "QUD Technologies"
+  }
+ ],
+ "clips": [
+  {
+   "id": "timed-jaber-inshiqaq-1-2",
+   "source_kind": "reviewed-timing",
+   "group": "jaber-inshiqaq",
+   "split": "holdout",
+   "surah": 84,
+   "ayah": 1,
+   "audio": "audio/timed-jaber-inshiqaq-1-2.wav",
+   "sha256": "5370b745ef2226954bf8d0aab8d228981e22604ebbab0aa9d30761346950dcbd",
+   "duration_s": 16.515,
+   "spoken_text": "إِذَا السَّمَاءُ انشَقَّتْ وَأَذِنَتْ لِرَبِّهَا وَحُقَّتْ وَإِذَا الْأَرْضُ مُدَّتْ وَأَلْقَتْ مَا فِيهَا وَتَخَلَّتْ وَأَذِنَتْ لِرَبِّهَا وَحُقَّتْ",
+   "spoken_text_verified": true,
+   "label_scope": "reviewed_recited_quran_word_ids_and_times",
+   "error_labels_complete": false,
+   "reviewed_word_ids": [
+    "84:1:1",
+    "84:1:2",
+    "84:1:3",
+    "84:2:1",
+    "84:2:2",
+    "84:2:3",
+    "84:3:1",
+    "84:3:2",
+    "84:3:3",
+    "84:4:1",
+    "84:4:2",
+    "84:4:3",
+    "84:4:4",
+    "84:5:1",
+    "84:5:2",
+    "84:5:3"
+   ],
+   "spoken_word_times_ms": [
+    [
+     0,
+     460
+    ],
+    [
+     460,
+     2700
+    ],
+    [
+     2700,
+     4180
+    ],
+    [
+     4180,
+     5170
+    ],
+    [
+     5170,
+     6420
+    ],
+    [
+     6420,
+     7880
+    ],
+    [
+     7880,
+     8250
+    ],
+    [
+     8250,
+     8890
+    ],
+    [
+     8890,
+     9700
+    ],
+    [
+     9700,
+     10720
+    ],
+    [
+     10720,
+     11190
+    ],
+    [
+     11190,
+     12060
+    ],
+    [
+     12060,
+     13260
+    ],
+    [
+     13260,
+     14230
+    ],
+    [
+     14230,
+     15510
+    ],
+    [
+     15510,
+     16515
+    ]
+   ],
+   "publisher_start_sample": 92168,
+   "publisher_end_sample": 356408,
+   "qud_start_s": 5.78,
+   "qud_end_s": 22.295,
+   "segment_indices": [
+    1,
+    2
+   ],
+   "anchor_offset_s": -0.0195,
+   "anchors": [
+    {
+     "qud_time_s": 6.18,
+     "offset_s": -0.0195,
+     "corr": 0.9367
+    },
+    {
+     "qud_time_s": 14.0375,
+     "offset_s": -0.029,
+     "corr": 0.961
+    },
+    {
+     "qud_time_s": 17.795,
+     "offset_s": -0.0185,
+     "corr": 0.9637
+    }
+   ]
+  },
+  {
+   "id": "timed-jaber-inshiqaq-4-5",
+   "source_kind": "reviewed-timing",
+   "group": "jaber-inshiqaq",
+   "split": "holdout",
+   "surah": 84,
+   "ayah": 7,
+   "audio": "audio/timed-jaber-inshiqaq-4-5.wav",
+   "sha256": "751d9f8ea632d1f986f07623c7dba22fbac751800b7d2fd75292537aa74c4595",
+   "duration_s": 16.015,
+   "spoken_text": "فَأَمَّا مَنْ أُوتِيَ كِتَابَهُ بِيَمِينِهِ فَسَوْفَ يُحَاسَبُ حِسَابًا يَسِيرًا وَيَنقَلِبُ إِلَىٰ أَهْلِهِ مَسْرُورًا",
+   "spoken_text_verified": true,
+   "label_scope": "reviewed_recited_quran_word_ids_and_times",
+   "error_labels_complete": false,
+   "reviewed_word_ids": [
+    "84:7:1",
+    "84:7:2",
+    "84:7:3",
+    "84:7:4",
+    "84:7:5",
+    "84:8:1",
+    "84:8:2",
+    "84:8:3",
+    "84:8:4",
+    "84:9:1",
+    "84:9:2",
+    "84:9:3",
+    "84:9:4"
+   ],
+   "spoken_word_times_ms": [
+    [
+     0,
+     1460
+    ],
+    [
+     1460,
+     1830
+    ],
+    [
+     1830,
+     2710
+    ],
+    [
+     2710,
+     4110
+    ],
+    [
+     4110,
+     5490
+    ],
+    [
+     5490,
+     6340
+    ],
+    [
+     6340,
+     7410
+    ],
+    [
+     7410,
+     8970
+    ],
+    [
+     8970,
+     10115
+    ],
+    [
+     11115,
+     12855
+    ],
+    [
+     12855,
+     13485
+    ],
+    [
+     13485,
+     14545
+    ],
+    [
+     14545,
+     16015
+    ]
+   ],
+   "publisher_start_sample": 547208,
+   "publisher_end_sample": 803448,
+   "qud_start_s": 34.215,
+   "qud_end_s": 50.23,
+   "segment_indices": [
+    4,
+    5
+   ],
+   "anchor_offset_s": -0.0145,
+   "anchors": [
+    {
+     "qud_time_s": 34.615,
+     "offset_s": -0.0145,
+     "corr": 0.9683
+    },
+    {
+     "qud_time_s": 42.2225,
+     "offset_s": -0.014,
+     "corr": 0.9598
+    },
+    {
+     "qud_time_s": 45.73,
+     "offset_s": -0.0175,
+     "corr": 0.9667
+    }
+   ]
+  },
+  {
+   "id": "timed-husary-fath-21-22",
+   "source_kind": "reviewed-timing",
+   "group": "husary-fath",
+   "split": "holdout",
+   "surah": 48,
+   "ayah": 12,
+   "audio": "audio/timed-husary-fath-21-22.wav",
+   "sha256": "fbbb57b0bd3e536c617dcb6808d49054fa9d92927b0e9491acc0b87bf2f9be60",
+   "duration_s": 50.62,
+   "spoken_text": "بَلْ ظَنَنتُمْ أَن لَّن يَنقَلِبَ الرَّسُولُ وَالْمُؤْمِنُونَ إِلَىٰ أَهْلِيهِمْ أَبَدًا وَزُيِّنَ ذَٰلِكَ فِي قُلُوبِكُمْ وَزُيِّنَ ذَٰلِكَ فِي قُلُوبِكُمْ وَظَنَنتُمْ ظَنَّ السَّوْءِ وَكُنتُمْ قَوْمًا بُورًا",
+   "spoken_text_verified": true,
+   "label_scope": "reviewed_recited_quran_word_ids_and_times",
+   "error_labels_complete": false,
+   "reviewed_word_ids": [
+    "48:12:1",
+    "48:12:2",
+    "48:12:3",
+    "48:12:4",
+    "48:12:5",
+    "48:12:6",
+    "48:12:7",
+    "48:12:8",
+    "48:12:9",
+    "48:12:10",
+    "48:12:11",
+    "48:12:12",
+    "48:12:13",
+    "48:12:14",
+    "48:12:11",
+    "48:12:12",
+    "48:12:13",
+    "48:12:14",
+    "48:12:15",
+    "48:12:16",
+    "48:12:17",
+    "48:12:18",
+    "48:12:19",
+    "48:12:20"
+   ],
+   "spoken_word_times_ms": [
+    [
+     0,
+     470
+    ],
+    [
+     470,
+     2870
+    ],
+    [
+     2870,
+     3370
+    ],
+    [
+     3370,
+     5230
+    ],
+    [
+     5230,
+     7430
+    ],
+    [
+     7430,
+     9440
+    ],
+    [
+     9440,
+     12580
+    ],
+    [
+     12580,
+     13940
+    ],
+    [
+     13940,
+     16230
+    ],
+    [
+     16230,
+     18790
+    ],
+    [
+     18790,
+     20650
+    ],
+    [
+     20650,
+     22370
+    ],
+    [
+     22370,
+     23370
+    ],
+    [
+     23370,
+     25500
+    ],
+    [
+     30650,
+     32670
+    ],
+    [
+     32670,
+     34240
+    ],
+    [
+     34240,
+     35120
+    ],
+    [
+     35120,
+     37500
+    ],
+    [
+     37500,
+     40620
+    ],
+    [
+     40620,
+     42170
+    ],
+    [
+     42170,
+     43790
+    ],
+    [
+     43790,
+     46460
+    ],
+    [
+     46460,
+     49000
+    ],
+    [
+     49000,
+     50620
+    ]
+   ],
+   "publisher_start_sample": 7428480,
+   "publisher_end_sample": 8238400,
+   "qud_start_s": 452.5,
+   "qud_end_s": 503.12,
+   "segment_indices": [
+    21,
+    22
+   ],
+   "anchor_offset_s": 11.78,
+   "anchors": [
+    {
+     "qud_time_s": 452.9,
+     "offset_s": 11.78,
+     "corr": 0.8793
+    },
+    {
+     "qud_time_s": 477.81,
+     "offset_s": 11.791,
+     "corr": 0.985
+    },
+    {
+     "qud_time_s": 498.62,
+     "offset_s": 11.7745,
+     "corr": 0.8552
+    }
+   ]
+  },
+  {
+   "id": "timed-husary-fath-37-38",
+   "source_kind": "reviewed-timing",
+   "group": "husary-fath",
+   "split": "holdout",
+   "surah": 48,
+   "ayah": 18,
+   "audio": "audio/timed-husary-fath-37-38.wav",
+   "sha256": "6cba8ca0b303fb652317a2ea20bc05f816d1890b8ee9cb96c91adb337849a71b",
+   "duration_s": 45.58,
+   "spoken_text": "لَّقَدْ رَضِيَ اللَّهُ عَنِ الْمُؤْمِنِينَ إِذْ يُبَايِعُونَكَ تَحْتَ الشَّجَرَةِ فَعَلِمَ مَا فِي قُلُوبِهِمْ فَأَنزَلَ السَّكِينَةَ عَلَيْهِمْ فَأَنزَلَ السَّكِينَةَ عَلَيْهِمْ وَأَثَابَهُمْ فَتْحًا قَرِيبًا",
+   "spoken_text_verified": true,
+   "label_scope": "reviewed_recited_quran_word_ids_and_times",
+   "error_labels_complete": false,
+   "reviewed_word_ids": [
+    "48:18:1",
+    "48:18:2",
+    "48:18:3",
+    "48:18:4",
+    "48:18:5",
+    "48:18:6",
+    "48:18:7",
+    "48:18:8",
+    "48:18:9",
+    "48:18:10",
+    "48:18:11",
+    "48:18:12",
+    "48:18:13",
+    "48:18:14",
+    "48:18:15",
+    "48:18:16",
+    "48:18:14",
+    "48:18:15",
+    "48:18:16",
+    "48:18:17",
+    "48:18:18",
+    "48:18:19"
+   ],
+   "spoken_word_times_ms": [
+    [
+     0,
+     1150
+    ],
+    [
+     1150,
+     2180
+    ],
+    [
+     2180,
+     3700
+    ],
+    [
+     3700,
+     4370
+    ],
+    [
+     4370,
+     6990
+    ],
+    [
+     6990,
+     7620
+    ],
+    [
+     7620,
+     10860
+    ],
+    [
+     10860,
+     12090
+    ],
+    [
+     12090,
+     14050
+    ],
+    [
+     14050,
+     15620
+    ],
+    [
+     15620,
+     16500
+    ],
+    [
+     16500,
+     17360
+    ],
+    [
+     17360,
+     19570
+    ],
+    [
+     19570,
+     22050
+    ],
+    [
+     22050,
+     24450
+    ],
+    [
+     24450,
+     26440
+    ],
+    [
+     30390,
+     32780
+    ],
+    [
+     32780,
+     35330
+    ],
+    [
+     35330,
+     37470
+    ],
+    [
+     37470,
+     40800
+    ],
+    [
+     40800,
+     43510
+    ],
+    [
+     43510,
+     45580
+    ]
+   ],
+   "publisher_start_sample": 12904531,
+   "publisher_end_sample": 13633811,
+   "qud_start_s": 794.735,
+   "qud_end_s": 840.315,
+   "segment_indices": [
+    37,
+    38
+   ],
+   "anchor_offset_s": 11.7982,
+   "anchors": [
+    {
+     "qud_time_s": 795.135,
+     "offset_s": 11.8015,
+     "corr": 0.9304
+    },
+    {
+     "qud_time_s": 817.525,
+     "offset_s": 11.7982,
+     "corr": 0.755
+    },
+    {
+     "qud_time_s": 835.815,
+     "offset_s": 11.794,
+     "corr": 0.9019
+    }
+   ]
+  },
+  {
+   "id": "timed-minshawi-luqman-0-1",
+   "source_kind": "reviewed-timing",
+   "group": "minshawi-luqman",
+   "split": "holdout",
+   "surah": 31,
+   "ayah": 1,
+   "audio": "audio/timed-minshawi-luqman-0-1.wav",
+   "sha256": "420129744cdf5cb2fed243323a213f759471cfd2ebe158b478f3233b226ce4d3",
+   "duration_s": 13.93,
+   "spoken_text": "الم الم",
+   "spoken_text_verified": true,
+   "label_scope": "reviewed_recited_quran_word_ids_and_times",
+   "error_labels_complete": false,
+   "reviewed_word_ids": [
+    "31:1:1",
+    "31:1:1"
+   ],
+   "spoken_word_times_ms": [
+    [
+     0,
+     6940
+    ],
+    [
+     6940,
+     13930
+    ]
+   ],
+   "publisher_start_sample": 135701,
+   "publisher_end_sample": 358581,
+   "qud_start_s": 0.06,
+   "qud_end_s": 13.99,
+   "segment_indices": [
+    0,
+    1
+   ],
+   "anchor_offset_s": 8.4213,
+   "anchors": [
+    {
+     "qud_time_s": 1.0,
+     "offset_s": 8.4892,
+     "corr": 0.9522
+    },
+    {
+     "qud_time_s": 7.025,
+     "offset_s": 8.4213,
+     "corr": 0.8634
+    },
+    {
+     "qud_time_s": 9.49,
+     "offset_s": 8.4118,
+     "corr": 0.92
+    }
+   ]
+  },
+  {
+   "id": "timed-minshawi-luqman-2-5",
+   "source_kind": "reviewed-timing",
+   "group": "minshawi-luqman",
+   "split": "holdout",
+   "surah": 31,
+   "ayah": 2,
+   "audio": "audio/timed-minshawi-luqman-2-5.wav",
+   "sha256": "1b5e7cd7db17783afdf1f6302928ddc209761d166e1ca2657594376199f91f0d",
+   "duration_s": 16.225,
+   "spoken_text": "تِلْكَ آيَاتُ الْكِتَابِ الْحَكِيمِ تِلْكَ آيَاتُ الْكِتَابِ الْحَكِيمِ هُدًى وَرَحْمَةً لِّلْمُحْسِنِينَ هُدًى وَرَحْمَةً لِّلْمُحْسِنِينَ",
+   "spoken_text_verified": true,
+   "label_scope": "reviewed_recited_quran_word_ids_and_times",
+   "error_labels_complete": false,
+   "reviewed_word_ids": [
+    "31:2:1",
+    "31:2:2",
+    "31:2:3",
+    "31:2:4",
+    "31:2:1",
+    "31:2:2",
+    "31:2:3",
+    "31:2:4",
+    "31:3:1",
+    "31:3:2",
+    "31:3:3",
+    "31:3:1",
+    "31:3:2",
+    "31:3:3"
+   ],
+   "spoken_word_times_ms": [
+    [
+     0,
+     600
+    ],
+    [
+     600,
+     1610
+    ],
+    [
+     1610,
+     2690
+    ],
+    [
+     2690,
+     3953
+    ],
+    [
+     3953,
+     4543
+    ],
+    [
+     4543,
+     5513
+    ],
+    [
+     5513,
+     6723
+    ],
+    [
+     6723,
+     7885
+    ],
+    [
+     7885,
+     9245
+    ],
+    [
+     9245,
+     10135
+    ],
+    [
+     10135,
+     12025
+    ],
+    [
+     12025,
+     13256
+    ],
+    [
+     13256,
+     14605
+    ],
+    [
+     14605,
+     16225
+    ]
+   ],
+   "publisher_start_sample": 358502,
+   "publisher_end_sample": 618102,
+   "qud_start_s": 13.99,
+   "qud_end_s": 30.215,
+   "segment_indices": [
+    2,
+    5
+   ],
+   "anchor_offset_s": 8.4164,
+   "anchors": [
+    {
+     "qud_time_s": 14.3901,
+     "offset_s": 8.4227,
+     "corr": 0.856
+    },
+    {
+     "qud_time_s": 22.1026,
+     "offset_s": 8.4164,
+     "corr": 0.8741
+    },
+    {
+     "qud_time_s": 25.715,
+     "offset_s": 8.4087,
+     "corr": 0.8338
+    }
+   ]
+  },
+  {
+   "id": "timed-minshawi-luqman-8-9",
+   "source_kind": "reviewed-timing",
+   "group": "minshawi-luqman",
+   "split": "holdout",
+   "surah": 31,
+   "ayah": 5,
+   "audio": "audio/timed-minshawi-luqman-8-9.wav",
+   "sha256": "28efc8d4d9185af945fd07141f927956cc41f3aa5f3b35fdc51688a7725c9d49",
+   "duration_s": 20.015,
+   "spoken_text": "أُولَٰئِكَ عَلَىٰ هُدًى مِّن رَّبِّهِمْ وَأُولَٰئِكَ هُمُ الْمُفْلِحُونَ أُولَٰئِكَ عَلَىٰ هُدًى مِّن رَّبِّهِمْ وَأُولَٰئِكَ هُمُ الْمُفْلِحُونَ",
+   "spoken_text_verified": true,
+   "label_scope": "reviewed_recited_quran_word_ids_and_times",
+   "error_labels_complete": false,
+   "reviewed_word_ids": [
+    "31:5:1",
+    "31:5:2",
+    "31:5:3",
+    "31:5:4",
+    "31:5:5",
+    "31:5:6",
+    "31:5:7",
+    "31:5:8",
+    "31:5:1",
+    "31:5:2",
+    "31:5:3",
+    "31:5:4",
+    "31:5:5",
+    "31:5:6",
+    "31:5:7",
+    "31:5:8"
+   ],
+   "spoken_word_times_ms": [
+    [
+     0,
+     2420
+    ],
+    [
+     2420,
+     3000
+    ],
+    [
+     3000,
+     4180
+    ],
+    [
+     4180,
+     4240
+    ],
+    [
+     4240,
+     5600
+    ],
+    [
+     5600,
+     8070
+    ],
+    [
+     8070,
+     8500
+    ],
+    [
+     8500,
+     9975
+    ],
+    [
+     9975,
+     12405
+    ],
+    [
+     12405,
+     12955
+    ],
+    [
+     12955,
+     14115
+    ],
+    [
+     14115,
+     14225
+    ],
+    [
+     14225,
+     15575
+    ],
+    [
+     15575,
+     18045
+    ],
+    [
+     18045,
+     18465
+    ],
+    [
+     18465,
+     20015
+    ]
+   ],
+   "publisher_start_sample": 960118,
+   "publisher_end_sample": 1280358,
+   "qud_start_s": 51.59,
+   "qud_end_s": 71.605,
+   "segment_indices": [
+    8,
+    9
+   ],
+   "anchor_offset_s": 8.4174,
+   "anchors": [
+    {
+     "qud_time_s": 51.99,
+     "offset_s": 8.413,
+     "corr": 0.8816
+    },
+    {
+     "qud_time_s": 61.5976,
+     "offset_s": 8.4174,
+     "corr": 0.7354
+    },
+    {
+     "qud_time_s": 67.1051,
+     "offset_s": 8.4229,
+     "corr": 0.8987
+    }
+   ]
+  }
+ ]
+}

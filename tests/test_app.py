@@ -104,8 +104,8 @@ def client(service):
     class TransportStub:
         ready = True
         verses = service.verses
-        def analyze(self, audio, ayah):
-            return dict(status="no_difference", ayah=ayah, errors=[], message="آزمون انتقال")
+        def analyze(self, audio, ayah, surah=1):
+            return dict(status="no_difference", surah=surah, ayah=ayah, errors=[], message="آزمون انتقال")
     app = create_app(TransportStub())
     app.config["TESTING"] = True
     return app.test_client()
@@ -119,7 +119,9 @@ def test_page_assets_and_api(client):
     response = client.get("/")
     assert response.status_code == 200
     assert 'dir="rtl"' in response.text
-    assert response.text.count('class="verse-button') == 7
+    assert 'id="precise-surah"' in response.text
+    assert 'id="verse-nav"' in response.text
+    assert len(client.get('/api/quran/ayahs?surah=1').json['ayahs']) == 7
     for path in ["/static/style.css", "/static/app.js"]:
         assert client.get(path).status_code == 200
     response = upload(client, ayah="5")
@@ -127,9 +129,37 @@ def test_page_assets_and_api(client):
     assert "elapsed_seconds" in response.json
 
 
-@pytest.mark.parametrize("fields", [{"ayah": "0"}, {"ayah": "8"}, {"ayah": "abc"}, {"surah": "2"}])
+@pytest.mark.parametrize("fields", [{"ayah": "0"}, {"ayah": "8"}, {"ayah": "abc"}, {"surah": "115"}, {"surah":"2","ayah":"287"}])
 def test_invalid_reference(client, fields):
     assert upload(client, **fields).status_code == 400
+
+
+def test_all_quran_browsing_and_non_fatiha_analysis(client):
+    catalog=client.get('/api/quran/surahs').json['surahs']
+    assert len(catalog)==114 and sum(s['ayah_count'] for s in catalog)==6236
+    page=client.get('/api/quran/ayahs?surah=2&start=255&limit=2')
+    assert page.status_code==200 and page.json['total']==286
+    assert [a['ayah'] for a in page.json['ayahs']]==[255,256]
+    assert all(a['surah']==2 and a['words'] for a in page.json['ayahs'])
+    response=upload(client,surah='114',ayah='6')
+    assert response.status_code==200 and response.json['surah']==114
+    for query in ['surah=115','surah=2&start=287','surah=2&limit=0','limit=51','surah=no']:
+        assert client.get('/api/quran/ayahs?'+query).status_code==400
+
+
+def test_combined_health_requires_both_models_and_speech_detector(client):
+    assert client.get('/health').status_code==503
+    transcriber=client.application.extensions['transcription_service']
+    transcriber.ready=True
+    transcriber.device='mps'
+    assert client.get('/health').status_code==503
+    transcriber.activity_detector.ready=True
+    health=client.get('/health')
+    assert health.status_code==200 and health.json['ready']
+    assert health.json['models']['transcription']['device']=='mps'
+    assert health.json['models']['speech_activity']['device']=='cpu'
+    assert health.json['models']['speech_activity']['ready']
+    assert health.json['protocol_version']==2
 
 
 def test_errors_busy_model_and_lock_release(client):

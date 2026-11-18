@@ -84,12 +84,16 @@ export async function openMicrophone(onSamples, signal) {
 }
 
 export async function readAudioFile(file) {
-  if (file.size > 10 * 1024 * 1024) throw new Error("حجم فایل باید حداکثر ۱۰ مگابایت باشد.");
+  if (file.size > 100 * 1024 * 1024) throw new Error("حجم فایل باید حداکثر ۱۰۰ مگابایت باشد.");
+  return decodePracticeBlob(file);
+}
+
+export async function decodePracticeBlob(file) {
   const decoder = new OfflineAudioContext(1, 1, 16000);
   let audio;
   try { audio = await decoder.decodeAudioData(await file.arrayBuffer()); }
   catch { throw new Error("مرورگر این فایل را نخواند؛ فایل WAV یا MP3 دیگری انتخاب کنید."); }
-  if (audio.duration < .5 || audio.duration > 180) throw new Error("مدت فایل باید بین نیم ثانیه و سه دقیقه باشد.");
+  if (audio.duration < .5 || audio.duration > 1800) throw new Error("مدت فایل باید بین نیم ثانیه و ۳۰ دقیقه باشد.");
   const samples = new Float32Array(audio.length);
   for (let channel = 0; channel < audio.numberOfChannels; channel++) {
     const data = audio.getChannelData(channel);

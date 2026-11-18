@@ -1,0 +1,13 @@
+{
+  "version": 1,
+  "purpose": "Additional controls selected after the first 22 repair clips, before evaluating either follow-up hypothesis. No tuning on these files.",
+  "reader_ids": [9, 10],
+  "reader_selection": "Lowest two full-Hafs reader IDs absent from the original 14 and the initial repair three. Read once and double the first one-word verse using the publisher interval, then retain verses 1–3.",
+  "chapters": [52, 103],
+  "single_letter_edits": [
+    {"surah":109,"ayah":6,"position":2,"donor":[8,49,10],"intended":"دينكم","heard":"دينهم","changes":["ك","ه"]},
+    {"surah":110,"ayah":1,"position":2,"donor":[2,20,15],"intended":"جاء","heard":"شاء","changes":["ج","ش"]},
+    {"surah":103,"ayah":3,"position":7,"donor":[22,27,4],"intended":"بالحق","heard":"بالحج","changes":["ق","ج"]}
+  ],
+  "scoring": "Both copies on the repeated one-word verse; no mark on full-verse rereading. Score the exact consonant on the time-owned uttered word, plus intact siblings. Only release a follow-up with an additional independently correct site or repeated occurrence and no deterioration on the previously checked controls."
+}

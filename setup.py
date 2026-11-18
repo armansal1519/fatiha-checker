@@ -67,17 +67,19 @@ def install_dependencies(python, *, offline=False):
 
 
 def verify_runtime(python):
-    print("[3/4] Checking Python imports and all seven references ...", flush=True)
+    print("[3/4] Checking Python imports and the complete local Hafs corpus ...", flush=True)
     run([python, "-c", "import av, flask, flask_sock, numpy, simple_websocket, torch; "
-         "from quran_muaalem import Muaalem; from recitation import RecitationService; "
+         "from quran_muaalem import Muaalem; from transformers import WhisperForConditionalGeneration, WhisperProcessor; "
+         "from recitation import RecitationService; from quran_corpus import QuranCorpus; "
          "assert torch.version.cuda is None, 'A CPU PyTorch installation is required'; "
-         "assert len(RecitationService().references) == 7; print('Runtime imports and references OK.')"])
+         "assert len(RecitationService().references) == 7; assert QuranCorpus().validate() == 6236; "
+         "print('Runtime imports, 114 surahs and 6236 ayahs OK.')"])
 
 
 def main(argv=None):
-    parser = argparse.ArgumentParser(description="Set up the local Hamkhan app, CPU dependencies and its pinned Quran model.")
+    parser = argparse.ArgumentParser(description="Set up Hamkhan, both pinned speech models and the offline speech activity detector.")
     parser.add_argument("--offline", action="store_true", help="Verify an existing installation/cache without network access.")
-    parser.add_argument("--skip-model", action="store_true", help="Install dependencies only; defer the 2.4 GB model download.")
+    parser.add_argument("--skip-model", action="store_true", help="Install dependencies only; defer the speech models and activity detector (about 4 GB total).")
     parser.add_argument("--run", action="store_true", help="Start the app after successful setup.")
     args = parser.parse_args(argv)
     if args.skip_model and args.run:
@@ -89,9 +91,11 @@ def main(argv=None):
         if args.skip_model:
             print("[4/4] Model preparation skipped. Run python setup.py before using the app.")
         else:
-            print("[4/4] Preparing the pinned model (about 2.4 GB on the first download) ...", flush=True)
-            run([python, "-c", "from model_assets import ensure_model; "
-                 f"print('Model cache ready: ' + ensure_model(offline={args.offline!r}))"])
+            print("[4/4] Preparing pinned speech models and activity detector (about 4 GB on the first download) ...", flush=True)
+            run([python, "-c", "from model_assets import ensure_model, ensure_transcription_model, ensure_activity_model; "
+                 f"print('Phonetic model cache ready: ' + ensure_model(offline={args.offline!r})); "
+                 f"print('Transcription model cache ready: ' + ensure_transcription_model(offline={args.offline!r})); "
+                 f"print('Speech activity model cache ready: ' + str(ensure_activity_model(offline={args.offline!r})))"])
         command = "& '" + str(python).replace("'", "''") + "' app.py" if os.name == "nt" else shlex.quote(str(python)) + " app.py"
         print(f'\nSetup finished. Start the app with:\n  {command}\nOpen http://127.0.0.1:5000/live after the model loads.')
         if args.run:

@@ -1,0 +1,635 @@
+{
+  "format_version": 1,
+  "description": "Aggregates from two historical Mac evaluations of public audio. Counts reflect each named experiment and split. Hashes identify original local artifacts. Human sparse labels measure word site and category.",
+  "model_revisions": {
+    "recitation": "01a1ef9fbe40d144ef845101e89ff924aed3fef5",
+    "speech_activity": "5cd7945676eb32225748052e2e6a0580e4686a08",
+    "transcription": "41f01f3fe87f28c78e2fbf8b568835947dd65ed9"
+  },
+  "fixture_sha256": {
+    "assets-v1.json": "6173db11bd2bb312c1eb8ca660e95fd71fe14786e4446a5937379f1640b981ee",
+    "repair-voices-lock.json": "e5a26e2849ce380bac87bbe91a0bb2abfbf8ed02e593a0e58f5648e549b1de94",
+    "repair-confirmation-lock.json": "87aa3da224deccca54c76998e7ebfd4bcba5181dea4b705ed1e61a9561f1af15",
+    "timing-v1.json": "a372c64dcb2a661a0b22b4e5ed45dd0eea8c49d9adb019434e6a25cf119fb20d"
+  },
+  "cohorts": {
+    "upgrade_dev": {
+      "baseline": {
+        "control_clips": 30,
+        "exact_words": 22,
+        "exact_words_and_errors": 12,
+        "word_errors": 9,
+        "words": 155,
+        "controlled_repeat_retained": 4,
+        "controlled_repeat_expected": 6,
+        "structure": {
+          "repetition": {
+            "tp": 3,
+            "fp": 0,
+            "fn": 3
+          },
+          "omission": {
+            "tp": 2,
+            "fp": 0,
+            "fn": 4
+          },
+          "transposition": {
+            "tp": 2,
+            "fp": 0,
+            "fn": 10
+          },
+          "substitution": {
+            "tp": 3,
+            "fp": 0,
+            "fn": 3
+          },
+          "insertion": {
+            "tp": 0,
+            "fp": 0,
+            "fn": 0
+          }
+        },
+        "off_target_word_warnings": 4,
+        "learner_letter_sites": {
+          "positional_and_supported": 27,
+          "typed_hits": 1,
+          "missed": 26
+        },
+        "no_published_error_clips": 25,
+        "no_published_error_clips_with_any_warning": 5
+      },
+      "candidate": {
+        "control_clips": 30,
+        "exact_words": 22,
+        "exact_words_and_errors": 13,
+        "word_errors": 9,
+        "words": 155,
+        "controlled_repeat_retained": 4,
+        "controlled_repeat_expected": 6,
+        "structure": {
+          "repetition": {
+            "tp": 2,
+            "fp": 0,
+            "fn": 4
+          },
+          "omission": {
+            "tp": 2,
+            "fp": 0,
+            "fn": 4
+          },
+          "transposition": {
+            "tp": 6,
+            "fp": 0,
+            "fn": 6
+          },
+          "substitution": {
+            "tp": 4,
+            "fp": 0,
+            "fn": 2
+          },
+          "insertion": {
+            "tp": 0,
+            "fp": 1,
+            "fn": 0
+          }
+        },
+        "off_target_word_warnings": 8,
+        "learner_letter_sites": {
+          "positional_and_supported": 27,
+          "typed_hits": 1,
+          "missed": 26
+        },
+        "no_published_error_clips": 25,
+        "no_published_error_clips_with_any_warning": 5
+      }
+    },
+    "repair_dev": {
+      "baseline": {
+        "control_clips": 30,
+        "exact_words": 22,
+        "exact_words_and_errors": 13,
+        "word_errors": 9,
+        "words": 155,
+        "controlled_repeat_retained": 4,
+        "controlled_repeat_expected": 6,
+        "structure": {
+          "repetition": {
+            "tp": 2,
+            "fp": 0,
+            "fn": 4
+          },
+          "omission": {
+            "tp": 2,
+            "fp": 0,
+            "fn": 4
+          },
+          "transposition": {
+            "tp": 6,
+            "fp": 0,
+            "fn": 6
+          },
+          "substitution": {
+            "tp": 4,
+            "fp": 0,
+            "fn": 2
+          },
+          "insertion": {
+            "tp": 0,
+            "fp": 1,
+            "fn": 0
+          }
+        },
+        "off_target_word_warnings": 8,
+        "learner_letter_sites": {
+          "positional_and_supported": 27,
+          "typed_hits": 1,
+          "missed": 26
+        },
+        "no_published_error_clips": 25,
+        "no_published_error_clips_with_any_warning": 5
+      },
+      "candidate": {
+        "control_clips": 30,
+        "exact_words": 24,
+        "exact_words_and_errors": 14,
+        "word_errors": 7,
+        "words": 155,
+        "controlled_repeat_retained": 6,
+        "controlled_repeat_expected": 6,
+        "structure": {
+          "repetition": {
+            "tp": 5,
+            "fp": 0,
+            "fn": 1
+          },
+          "omission": {
+            "tp": 2,
+            "fp": 0,
+            "fn": 4
+          },
+          "transposition": {
+            "tp": 6,
+            "fp": 0,
+            "fn": 6
+          },
+          "substitution": {
+            "tp": 4,
+            "fp": 1,
+            "fn": 2
+          },
+          "insertion": {
+            "tp": 0,
+            "fp": 1,
+            "fn": 0
+          }
+        },
+        "off_target_word_warnings": 9,
+        "learner_letter_sites": {
+          "positional_and_supported": 27,
+          "typed_hits": 3,
+          "missed": 24
+        },
+        "no_published_error_clips": 25,
+        "no_published_error_clips_with_any_warning": 5
+      }
+    },
+    "upgrade_holdout": {
+      "baseline": {
+        "control_clips": 30,
+        "exact_words": 16,
+        "exact_words_and_errors": 6,
+        "word_errors": 18,
+        "words": 150,
+        "controlled_repeat_retained": 4,
+        "controlled_repeat_expected": 6,
+        "structure": {
+          "repetition": {
+            "tp": 1,
+            "fp": 0,
+            "fn": 5
+          },
+          "omission": {
+            "tp": 2,
+            "fp": 0,
+            "fn": 4
+          },
+          "transposition": {
+            "tp": 4,
+            "fp": 0,
+            "fn": 8
+          },
+          "substitution": {
+            "tp": 1,
+            "fp": 0,
+            "fn": 5
+          },
+          "insertion": {
+            "tp": 0,
+            "fp": 0,
+            "fn": 0
+          }
+        },
+        "off_target_word_warnings": 6,
+        "learner_letter_sites": {
+          "positional_and_supported": 10,
+          "typed_hits": 0,
+          "missed": 10
+        },
+        "no_published_error_clips": 17,
+        "no_published_error_clips_with_any_warning": 3
+      },
+      "candidate": {
+        "control_clips": 30,
+        "exact_words": 16,
+        "exact_words_and_errors": 8,
+        "word_errors": 18,
+        "words": 150,
+        "controlled_repeat_retained": 4,
+        "controlled_repeat_expected": 6,
+        "structure": {
+          "repetition": {
+            "tp": 2,
+            "fp": 0,
+            "fn": 4
+          },
+          "omission": {
+            "tp": 2,
+            "fp": 0,
+            "fn": 4
+          },
+          "transposition": {
+            "tp": 6,
+            "fp": 0,
+            "fn": 6
+          },
+          "substitution": {
+            "tp": 2,
+            "fp": 0,
+            "fn": 4
+          },
+          "insertion": {
+            "tp": 0,
+            "fp": 0,
+            "fn": 0
+          }
+        },
+        "off_target_word_warnings": 7,
+        "learner_letter_sites": {
+          "positional_and_supported": 10,
+          "typed_hits": 0,
+          "missed": 10
+        },
+        "no_published_error_clips": 17,
+        "no_published_error_clips_with_any_warning": 2
+      }
+    },
+    "repair_holdout": {
+      "baseline": {
+        "control_clips": 30,
+        "exact_words": 16,
+        "exact_words_and_errors": 8,
+        "word_errors": 18,
+        "words": 150,
+        "controlled_repeat_retained": 4,
+        "controlled_repeat_expected": 6,
+        "structure": {
+          "repetition": {
+            "tp": 2,
+            "fp": 0,
+            "fn": 4
+          },
+          "omission": {
+            "tp": 2,
+            "fp": 0,
+            "fn": 4
+          },
+          "transposition": {
+            "tp": 6,
+            "fp": 0,
+            "fn": 6
+          },
+          "substitution": {
+            "tp": 2,
+            "fp": 0,
+            "fn": 4
+          },
+          "insertion": {
+            "tp": 0,
+            "fp": 0,
+            "fn": 0
+          }
+        },
+        "off_target_word_warnings": 7,
+        "learner_letter_sites": {
+          "positional_and_supported": 10,
+          "typed_hits": 0,
+          "missed": 10
+        },
+        "no_published_error_clips": 17,
+        "no_published_error_clips_with_any_warning": 2
+      },
+      "candidate": {
+        "control_clips": 30,
+        "exact_words": 18,
+        "exact_words_and_errors": 9,
+        "word_errors": 16,
+        "words": 150,
+        "controlled_repeat_retained": 6,
+        "controlled_repeat_expected": 6,
+        "structure": {
+          "repetition": {
+            "tp": 3,
+            "fp": 0,
+            "fn": 3
+          },
+          "omission": {
+            "tp": 2,
+            "fp": 0,
+            "fn": 4
+          },
+          "transposition": {
+            "tp": 6,
+            "fp": 0,
+            "fn": 6
+          },
+          "substitution": {
+            "tp": 2,
+            "fp": 0,
+            "fn": 4
+          },
+          "insertion": {
+            "tp": 0,
+            "fp": 0,
+            "fn": 0
+          }
+        },
+        "off_target_word_warnings": 7,
+        "learner_letter_sites": {
+          "positional_and_supported": 10,
+          "typed_hits": 2,
+          "missed": 8
+        },
+        "no_published_error_clips": 17,
+        "no_published_error_clips_with_any_warning": 2
+      }
+    }
+  },
+  "repair_all_controls": {
+    "baseline": {
+      "control_clips": 60,
+      "exact_words": 38,
+      "exact_words_and_errors": 21,
+      "word_errors": 27,
+      "words": 305,
+      "controlled_repeat_retained": 8,
+      "controlled_repeat_expected": 12,
+      "off_target_word_warnings": 15,
+      "no_published_error_clips": 42,
+      "no_published_error_clips_with_any_warning": 7,
+      "repeat_warnings": {
+        "tp": 4,
+        "fp": 0,
+        "fn": 8
+      },
+      "learner_letter_sites": {
+        "typed_hits": 1,
+        "missed": 36,
+        "positional_and_supported": 37
+      }
+    },
+    "candidate": {
+      "control_clips": 60,
+      "exact_words": 42,
+      "exact_words_and_errors": 23,
+      "word_errors": 23,
+      "words": 305,
+      "controlled_repeat_retained": 12,
+      "controlled_repeat_expected": 12,
+      "off_target_word_warnings": 16,
+      "no_published_error_clips": 42,
+      "no_published_error_clips_with_any_warning": 7,
+      "repeat_warnings": {
+        "tp": 8,
+        "fp": 0,
+        "fn": 4
+      },
+      "learner_letter_sites": {
+        "typed_hits": 5,
+        "missed": 32,
+        "positional_and_supported": 37
+      }
+    }
+  },
+  "upgrade_soak": {
+    "input_duration_seconds": 1800.0,
+    "sample_rate": 44100,
+    "samples_sent": 79380000,
+    "acknowledged_samples": 79380000,
+    "first_transcript_seconds": 2.4732,
+    "first_reviewed_seconds": 38.1845,
+    "model_stage_calls": {
+      "asr": 1071,
+      "phonetic": 1071,
+      "vad": 1071,
+      "vad_frame_evaluations": 225637,
+      "unknown": {
+        "asr": 0,
+        "phonetic": 0,
+        "vad": 0
+      }
+    },
+    "coverage": {
+      "first_transcript_ms": 2473.0,
+      "first_feedback_ms": 38173.2,
+      "first_position_ms": 36345.8,
+      "analyses": 1071,
+      "input_samples": 79380000,
+      "output_samples": 28800000,
+      "total_received_samples": 79380000,
+      "received_samples": 28800000,
+      "analyzed_samples": 28800000,
+      "committed_samples": 28800000,
+      "skipped_silence_samples": 0,
+      "model_samples": 28800000,
+      "coverage_complete": true,
+      "ring_max_samples": 480000,
+      "buffer_capacity_samples": 480000,
+      "peak_unanalyzed_samples": 333251,
+      "peak_waiting_stages": 1,
+      "inference_max_inflight": 1,
+      "queued_inference_jobs": 0,
+      "elapsed_ms": 1803581.9
+    }
+  },
+  "upgrade_unit_tests": {
+    "python": 352,
+    "javascript": 52
+  },
+  "repair_repeated_tail": {
+    "literal_phrase_preserved": true,
+    "ordinary_windows": 20,
+    "ordinary_windows_changed": 0,
+    "neighborhood_windows": 15,
+    "single_pass_boilerplate_windows": 8,
+    "verified_boilerplate_windows": 0
+  },
+  "repair_natural_rereads": {
+    "clips": 7,
+    "reviewed_occurrences": 107,
+    "repeat_occurrences": 23,
+    "repeat_occurrences_overlapping_reviewed_audio": 12,
+    "lexical_edit_distance": 25
+  },
+  "repair_live": {
+    "sessions": 13,
+    "samples_received": 2133924,
+    "complete_coverage": true
+  },
+  "repair_browser": {
+    "runs": 6,
+    "all_verified": true
+  },
+  "repair_22": {
+    "clips": 22,
+    "midword_repeat": {
+      "baseline": {
+        "automatic": {
+          "clips": 2,
+          "second_only_with_timed_ownership": 2
+        },
+        "manual": {
+          "clips": 2,
+          "second_only_with_timed_ownership": 2
+        }
+      },
+      "candidate": {
+        "automatic": {
+          "clips": 2,
+          "second_only_with_timed_ownership": 2
+        },
+        "manual": {
+          "clips": 2,
+          "second_only_with_timed_ownership": 2
+        }
+      }
+    },
+    "single_letter": {
+      "baseline": {
+        "automatic": {
+          "clips": 2,
+          "correct_raw_target": 2,
+          "raw_and_typed_contrast": 0
+        },
+        "manual": {
+          "clips": 2,
+          "correct_raw_target": 2,
+          "raw_and_typed_contrast": 0
+        }
+      },
+      "candidate": {
+        "automatic": {
+          "clips": 2,
+          "correct_raw_target": 2,
+          "raw_and_typed_contrast": 1
+        },
+        "manual": {
+          "clips": 2,
+          "correct_raw_target": 2,
+          "raw_and_typed_contrast": 1
+        }
+      }
+    },
+    "verse_reread": {
+      "baseline": {
+        "automatic": {
+          "clips": 3,
+          "correct_count_without_target_warning": 0
+        },
+        "manual": {
+          "clips": 3,
+          "correct_count_without_target_warning": 0
+        }
+      },
+      "candidate": {
+        "automatic": {
+          "clips": 3,
+          "correct_count_without_target_warning": 0
+        },
+        "manual": {
+          "clips": 3,
+          "correct_count_without_target_warning": 0
+        }
+      }
+    }
+  },
+  "confirmation_14": {
+    "clips": 14,
+    "matched_candidate_aggregates": true,
+    "verse_reread": {
+      "automatic": {
+        "clips": 4,
+        "correct_count_without_target_warning": 1
+      },
+      "manual": {
+        "clips": 4,
+        "correct_count_without_target_warning": 1
+      }
+    },
+    "single_letter": {
+      "automatic": {
+        "clips": 3,
+        "correct_raw_target": 3,
+        "raw_and_typed_contrast": 2
+      },
+      "manual": {
+        "clips": 3,
+        "correct_raw_target": 3,
+        "raw_and_typed_contrast": 2
+      }
+    }
+  },
+  "original_local_report_sha256": {
+    "UPGRADE_EVALUATION.md": {
+      "browser-chromium-recovery.json": "a1837ead201d53572a831a7aab2e6b3b4bf2901213e57c20316807421472dd28",
+      "browser-final.json": "0a04187a3626ff70b9b568a8b0ee3df17b0f353042a8473c207d2472beab7950",
+      "browser-panel-baseline.json": "8ebb1fde977f05a7852c46327afe259e0800c2cb913be8d85c8dd22dc9fa46cb",
+      "browser-panel-final.json": "4c8642097dac0e2d13e265dfb71ef96f19c520650da62c359e8737dd759ab070",
+      "browser-stress-webkit.json": "a266b82c7c3f45c2ed3c200d52361402579a8348c42beaeb6c71e9c981525b42",
+      "browser-upgrade-comparison.json": "ae1d45a1222a766245475d4cc77532e8191b49f5f501d805ca3df82f91333cb4",
+      "browser-webkit-final.json": "d41d4b3b1c1faacd399ecaa12f1adebda1175bb12366c87b74b0c0d5290f5bad",
+      "development-asr-comparison.json": "dff980d25cf12869165bc62537012120737f33a42fb77daeccd75d6a7f182b5e",
+      "development-incremental-comparison.json": "8b7e4bfad498d613c2ff307f638932e4f333c11d7b5f565eb8945ce1574881da",
+      "macos-voiceover-preflight.json": "0ee5707c0b5bef36315a09a74ebc731a4a3d327b9c2d378d02ad121460f20141",
+      "recitation-release-qa-dev.json": "8c62c81549293fc253d899be3935f40f9f1fca3f546a747e50635a4fb5579a65",
+      "recitation-release-qa-holdout.json": "2ebc9a055439175b0eea39704e8c858a162cca2bbca53f0ca2c033519372271e",
+      "timed-recitations-comparison.json": "f1a93dd91036f60f6abcf477ccdc2c89bf4f5df8b49e82e15bca1dbf1b37ac4a",
+      "upgrade-audio-challenges.json": "41684ec42cda97a6a8843f90a25bbfa3083b7ef365ed85194fd2ebfd07b02f84",
+      "upgrade-continuous-30min.json": "ef443d6a87631ec4d47cecf1bf5836b83dfadb59e849fcb559d1d7d0be49f992",
+      "upgrade-cpu.json": "6371196a939d46f56060527248f742800492de1a8a4ff27f277302ff8f90a233",
+      "upgrade-delivery.json": "ae23435d0dd1b44e80de3bb16da3f98657941d03c6c1114519d16c3730a2de45",
+      "upgrade-deployment.json": "089fd39d292194043962fe279058f81899f9059c8f7f3b4b780c86d22e27f69a",
+      "upgrade-location.json": "faa6fcc64ae0b86cdceb431674da55a34e14ccd35861e16db16ab988fd75b670",
+      "upgrade-passage-challenges.json": "1d4e077091d08ecb31918f4b0ec6841d1f6b164073965e6f90fabbc5119f3e2c"
+    },
+    "REPAIR_EVALUATION.md": {
+      "comparison-summary.json": "f21978934cd41d056082d8b1f82027bad4cba5f67f047a9654dceae160bc23c5",
+      "letter-repair-evidence.json": "eb296b3114c39a840f69029e244a83646965463b9c733a4a00e378e7cf9ad582",
+      "repair-browser-final.json": "6edb123617dadc3b37ca212d9e12b3d01aa96e29a30f78f2ee21de70793aeff4",
+      "repair-confirmation-deployed.json": "9a2c35864bb930c8afcda26a0aa6d15ddc7185a65a7018cc62350984fc91d449",
+      "repair-confirmation-experimental.json": "8156571ab0a374a401e4e2cdb97c0826bce6f49350bf4d88e54687cdfe87f2e6",
+      "repair-deployment.json": "c5ddefd341213a0896c537958e44619e92689fd6a14d457e1eab41e1ac5f209e",
+      "repair-final-qa-dev.json": "2a7f02856dd01980171fa4391d32f04d60695859c7829298db9ab7db30808b45",
+      "repair-final-qa-holdout.json": "8a9404b76719bfb29a26a6fd60076947712547705e760824b3fab2a254686d5a",
+      "repair-live-before.json": "029f84849b7a27d9fdd177628df0c8fa7041bb915bd07e7fa183a5cdb864e36b",
+      "repair-live-final.json": "ff734987850eee75368cd73996fbe7dcb6012bd7a9751731577728158357312d",
+      "repair-live-slice-before.json": "d8ecb54ed403acdebb66dd3d1144dc59a4c3d9154aa88da26b40d9977e9c44c3",
+      "repair-live-slice-final.json": "aa54fbbf0c534880c3d0bffbe811e5b5d4d9ee1a02c0a1782a8ccf30f28f2819",
+      "repair-new-deployed-five.json": "73da1f5a065cfbd86aa069ca69f5fd6224cea25c747d2e53ea3075d36d5363b5",
+      "repair-new-voices-paired.json": "7d662ed258c94580703dcfa52ea8340a1977d763e8c36cf23c0c4645529860fd",
+      "repair-reread-source-diagnostic.json": "7eb057879881e8f37c18657ef9c344b3774bfc15fe136b234dae76af22c0694d",
+      "repair-tail-verified.json": "d58e81bd6b4b7f4376743b05e117b5d9754f34fb7b02682a57bd6ac6a08c699e",
+      "repeat-fix-timed-final.json": "38652cd226a9983ccc8436d18689ff359e8dac74d2704679e55f96b4e5161766",
+      "solar-repeat-prototype.json": "a90eafe1b1965ce2e51d14fbed1d3ebc293bc73073bcb84ce3f2bfca505429b4"
+    }
+  }
+}

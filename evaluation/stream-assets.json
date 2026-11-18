@@ -1,0 +1,34 @@
+[
+  {
+    "file": "evaluation-pack/soak/baqarah.mp3",
+    "source": "Aaqib Azeez, Al-Baqarah (Murattal), Hafs an Asim",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/4/4f/Chapter_2%2C_Al-Baqarah_%28Murattal%29_-_Recitation_of_the_Holy_Qur%27an.mp3",
+    "license": "CC0",
+    "sha256": "897dafc7f83528ef9d2003f0d3455969a8f2ccd367b2fd56ed8ad623b2dfcd00",
+    "source_page": "https://commons.wikimedia.org/wiki/File:Chapter_2,_Al-Baqarah_(Murattal)_-_Recitation_of_the_Holy_Qur%27an.mp3"
+  },
+  {
+    "file": "challenge-audio/breathing.wav",
+    "source": "ESC-50, Freesound 18631 take A",
+    "url": "https://raw.githubusercontent.com/karolpiczak/ESC-50/33c8ce9eb2cf0b1c2f8bcf322eb349b6be34dbb6/audio/1-18631-A-23.wav",
+    "license": "CC BY-NC 3.0, research evaluation",
+    "sha256": "cdbd39617f2955d86ec18a4032ecd9090369c23f3d8c6d650f62e9e1ee19ea6a",
+    "source_page": "https://github.com/karolpiczak/ESC-50"
+  },
+  {
+    "file": "hallucination-repro/wbw-112-003-003.mp3",
+    "source": "Quran.com 112:3 word 3",
+    "url": "https://audio.qurancdn.com/wbw/112_003_003.mp3",
+    "license": "Publisher terms; local educational evaluation",
+    "source_page": "https://quran.com/terms-and-conditions",
+    "sha256": "4a58526cb4e5ec5f9113bfc7147a4fe3451923287eb62bc9f12beeeeb5268eca"
+  },
+  {
+    "file": "hallucination-repro/wbw-112-003-004.mp3",
+    "source": "Quran.com 112:3 word 4",
+    "url": "https://audio.qurancdn.com/wbw/112_003_004.mp3",
+    "license": "Publisher terms; local educational evaluation",
+    "source_page": "https://quran.com/terms-and-conditions",
+    "sha256": "92e1f5fe0b9d24bb5b7c1f4b3653c4458dfa40998f1c9b290579c461b0486fed"
+  }
+]

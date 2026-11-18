@@ -19,8 +19,8 @@ async function connected(t) {
   let url;
   const connection = new LiveConnection({onEvent:e=>events.push(e),onError:e=>errors.push(e),socketFactory:u=>{url=u; return socket;}});
   const controller = new AbortController();
-  const ready = connection.connect({sampleRate:16000,startAyah:5},controller.signal);
-  socket.open(); socket.event({type:'ready',session_id:'current',version:1});
+  const ready = connection.connect({sampleRate:16000,startSurah:1,startAyah:5},controller.signal);
+  socket.open(); socket.event({type:'ready',session_id:'current',version:2});
   await ready;
   t.after(()=>connection.close());
   return {connection,socket,events,errors,controller,url};
@@ -36,7 +36,7 @@ test('binary packet carries little-endian sequence, exact sample offset, and cli
 test('start precedes ordered PCM and stop contains final sequence/sample totals',async t=>{
   const {connection,socket,url} = await connected(t);
   assert.equal(url,'ws://127.0.0.1:5000/live/ws');
-  assert.deepEqual(JSON.parse(socket.sent[0]),{type:'start',version:1,start_ayah:5,sample_rate:16000,channels:1});
+  assert.deepEqual(JSON.parse(socket.sent[0]),{type:'start',version:2,start_surah:1,start_ayah:5,sample_rate:16000,channels:1});
   connection.sendSamples(new Float32Array(2048)); connection.sendSamples(new Float32Array(17));
   const first = new DataView(socket.sent[1]), second = new DataView(socket.sent[2]);
   assert.deepEqual([first.getUint32(0,true),first.getUint32(4,true),second.getUint32(0,true),second.getUint32(4,true)],[0,0,1,2048]);
@@ -80,7 +80,7 @@ test('foreign fatal error and duplicate ready cannot replace or terminate establ
   const {socket,connection,events,errors} = await connected(t);
   const count = events.length;
   socket.event({type:'error',session_id:'stale',fatal:true,code:'processing',message:'old failure'});
-  socket.event({type:'ready',session_id:'stale',version:1});
+  socket.event({type:'ready',session_id:'stale',version:2});
   assert.equal(connection.failed,false); assert.equal(connection.session,'current');
   assert.equal(errors.length,0); assert.equal(events.length,count);
 });
@@ -114,7 +114,7 @@ test('after intentional close late result, ready, or error cannot reach UI callb
   const {socket,connection,events,errors} = await connected(t);
   connection.close(); const count = events.length;
   socket.event({type:'result',session_id:'current',revision:3});
-  socket.event({type:'ready',session_id:'late',version:1});
+  socket.event({type:'ready',session_id:'late',version:2});
   socket.event({type:'error',session_id:'current',fatal:false,message:'late'});
   assert.equal(events.length,count); assert.equal(errors.length,0);
 });
@@ -134,4 +134,23 @@ test('abort during handshake rejects promptly and intentional cancellation stays
   const rejected = assert.rejects(ready,{name:'AbortError'});
   controller.abort(); await rejected;
   assert.equal(socket.readyState,3); assert.deepEqual(errors,[]);
+});
+
+test('manual reference is an ordered JSON command that does not reset PCM position',async t=>{
+  const {connection,socket}=await connected(t);
+  connection.sendSamples(new Float32Array(2048)); connection.setReference(114,3);
+  assert.deepEqual(JSON.parse(socket.sent[2]),{type:'reference',surah:114,ayah:3});
+  connection.sendSamples(new Float32Array(17));
+  const packet=new DataView(socket.sent[3]);
+  assert.equal(packet.getUint32(0,true),1); assert.equal(packet.getUint32(4,true),2048);
+});
+
+test('auto start sends null reference and rejects obsolete ready version',async()=>{
+  const socket=new FakeSocket(), errors=[];
+  const connection=new LiveConnection({onEvent:()=>{},onError:e=>errors.push(e),socketFactory:()=>socket});
+  const pending=connection.connect({sampleRate:16000},new AbortController().signal);
+  const rejection=assert.rejects(pending);
+  socket.open(); assert.deepEqual(JSON.parse(socket.sent[0]),{type:'start',version:2,start_surah:null,start_ayah:null,sample_rate:16000,channels:1});
+  socket.event({type:'ready',session_id:'old',version:1}); await rejection;
+  assert.equal(connection.failed,true); assert.equal(errors.length,1);
 });

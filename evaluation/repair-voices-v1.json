@@ -1,0 +1,21 @@
+{
+  "version": 1,
+  "purpose": "Additional voices selected before examining their model output for the tail, repeat and letter repair.",
+  "catalog": "https://www.mp3quran.net/api/v3/ayat_timing/reads",
+  "reader_ids": [3, 6, 8],
+  "reader_selection": "Lowest three IDs with all 114 surahs and Hafs in the cached publisher catalog, excluding all 14 readers of the previous pack.",
+  "reader_cases": ["112:3 through end joined to 113 opening through ayah 2", "93:1-3 unedited", "93:1 repeated then uninterrupted 93:1-3"],
+  "known_repeats": [[94,5],[106,2]],
+  "single_letter_edits": [
+    {"surah":111,"ayah":1,"position":3,"donor":[20,30,2],"intended":"أبي","heard":"أخي","type":"letter","changes":["ب","خ"]},
+    {"surah":105,"ayah":3,"position":3,"donor":[99,7,5],"intended":"طيرا","heard":"خيرا","type":"letter","changes":["ط","خ"]}
+  ],
+  "learner_recordings": [
+    ["6079251c-c320-4f32-b564-e658ce64edc6","chunk9.wav"],
+    ["3478e087-ee20-46dd-a4f6-16218e201bd6","chunk2.wav"],
+    ["6ef01da8-ee23-4053-bdea-7bff40ffcf9f","chunk14.wav"],
+    ["d6468d6f-421b-4bfb-b53c-465a9a1c50ee","chunk5.wav"],
+    ["bb73daed-eaa9-4874-8e5c-e836f311f819","chunk6.wav"]
+  ],
+  "learner_selection": "First five distinct unexamined Hafs recordings with no registered error ordered by SHA256 of hamkhan-repair1: + source filename. Recording ID does not certify separate speaker identity. No previously unused letter-labelled Hafs example remains in this source."
+}

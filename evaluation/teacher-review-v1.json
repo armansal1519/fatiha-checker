@@ -1,0 +1,852 @@
+{
+  "version": 1,
+  "dataset": "sobolev210/quran-recitation-errors",
+  "revision": "d196cd3132c69cd361d28cf6a8b442ae4e0bf0b4",
+  "license": "MIT",
+  "selection": {
+    "qa_sha256": {
+      "dev": "2a7f02856dd01980171fa4391d32f04d60695859c7829298db9ab7db30808b45",
+      "holdout": "8a9404b76719bfb29a26a6fd60076947712547705e760824b3fab2a254686d5a"
+    },
+    "eligible_sites": 37,
+    "previously_missed": 32,
+    "clean_controls": 6
+  },
+  "clips": {
+    "learner-0c0463c9-chunk3": {
+      "path": "temp_audio_chunks/chunks_recording_0c0463c9-964e-423a-95c5-f7e68f540c9c/chunk3.wav",
+      "sha256": "04543f6e3c98d12b0b1b9d3b78854f40874f918f7c66aeed34bfbf26fdc97010",
+      "seconds": 3.225,
+      "surah": 114,
+      "ayah": 4,
+      "words": [
+        "مِن",
+        "شَرِّ",
+        "الْوَسْوَاسِ",
+        "الْخَنَّاسِ"
+      ]
+    },
+    "learner-11c75fcb-chunk3": {
+      "path": "temp_audio_chunks/chunks_recording_11c75fcb-da35-47fa-8df3-03994f272458/chunk3.wav",
+      "sha256": "de5414cb5dc2fbab65cd1f5e2d423415a70d8ab454dc8c62412eaa0ecb5ec458",
+      "seconds": 4.315,
+      "surah": 102,
+      "ayah": 8,
+      "words": [
+        "ثُمَّ",
+        "لَتُسْأَلُنَّ",
+        "يَوْمَئِذٍ",
+        "عَنِ",
+        "النَّعِيمِ"
+      ]
+    },
+    "learner-18811651-chunk1": {
+      "path": "temp_audio_chunks/chunks_recording_18811651-0121-4ddd-a969-e9fb295c4a18/chunk1.wav",
+      "sha256": "d38bb41f9c8ea719a3f8db84d5fc0564412e21da8b68b768a7c3e87d2681ec57",
+      "seconds": 4.305,
+      "surah": 106,
+      "ayah": 2,
+      "words": [
+        "إِيلَافِهِمْ",
+        "رِحْلَةَ",
+        "الشِّتَاءِ",
+        "وَالصَّيْفِ"
+      ]
+    },
+    "learner-2c3c83de-chunk1": {
+      "path": "temp_audio_chunks/chunks_recording_2c3c83de-30e2-4c78-a1b4-9da44ec14135/chunk1.wav",
+      "sha256": "520b8632519065183462cd2c472397ad9d262d6d8dabca7d2437f11711a339ea",
+      "seconds": 5.153,
+      "surah": 99,
+      "ayah": 1,
+      "words": [
+        "إِذَا",
+        "زُلْزِلَتِ",
+        "الْأَرْضُ",
+        "زِلْزَالَهَا"
+      ]
+    },
+    "learner-2c3c83de-chunk2": {
+      "path": "temp_audio_chunks/chunks_recording_2c3c83de-30e2-4c78-a1b4-9da44ec14135/chunk2.wav",
+      "sha256": "705539cc6d0ed276307869795beee7bb3376a97303edb304164247da28e239f4",
+      "seconds": 4.612,
+      "surah": 99,
+      "ayah": 2,
+      "words": [
+        "وَأَخْرَجَتِ",
+        "الْأَرْضُ",
+        "أَثْقَالَهَا"
+      ]
+    },
+    "learner-2c3c83de-chunk4": {
+      "path": "temp_audio_chunks/chunks_recording_2c3c83de-30e2-4c78-a1b4-9da44ec14135/chunk4.wav",
+      "sha256": "a8e6450904bba7956a015388849ee0af706f5d0d6b5dc9d24135ecaf35225d83",
+      "seconds": 5.189,
+      "surah": 99,
+      "ayah": 4,
+      "words": [
+        "يَوْمَئِذٍ",
+        "تُحَدِّثُ",
+        "أَخْبَارَهَا"
+      ]
+    },
+    "learner-2c3c83de-chunk6": {
+      "path": "temp_audio_chunks/chunks_recording_2c3c83de-30e2-4c78-a1b4-9da44ec14135/chunk6.wav",
+      "sha256": "d93f1c1d5937cf8b724314a63c0323cedc618f55e61e1455e9231fb3ab967402",
+      "seconds": 7.974,
+      "surah": 99,
+      "ayah": 6,
+      "words": [
+        "يَوْمَئِذٍ",
+        "يَصْدُرُ",
+        "النَّاسُ",
+        "أَشْتَاتًا",
+        "لِّيُرَوْا",
+        "أَعْمَالَهُمْ"
+      ]
+    },
+    "learner-3071edd1-chunk1": {
+      "path": "temp_audio_chunks/chunks_recording_3071edd1-f92a-4aaf-9849-39bad0549b36/chunk1.wav",
+      "sha256": "66855fa13ad5ad86cfeda16a23d98f51e45c4ca35dabb2d6be60170b86211cb2",
+      "seconds": 6.463,
+      "surah": 107,
+      "ayah": 2,
+      "words": [
+        "فَذَٰلِكَ",
+        "الَّذِي",
+        "يَدُعُّ",
+        "الْيَتِيمَ"
+      ]
+    },
+    "learner-34fd8b43-chunk1": {
+      "path": "temp_audio_chunks/chunks_recording_34fd8b43-34b5-438c-a9ba-437df4ef9196/chunk1.wav",
+      "sha256": "914b68dfdf01dad36c8f7f4a7058fd923b602d9e67535513fd1ef6295fff2d51",
+      "seconds": 3.222,
+      "surah": 100,
+      "ayah": 8,
+      "words": [
+        "وَإِنَّهُ",
+        "لِحُبِّ",
+        "الْخَيْرِ",
+        "لَشَدِيدٌ"
+      ]
+    },
+    "learner-4628ef89-chunk0": {
+      "path": "temp_audio_chunks/chunks_recording_4628ef89-1038-4336-a147-dfc5e21544ec/chunk0.wav",
+      "sha256": "a0bafed60d5036fc892621889d59a6605b12db101858693e509d67fd8ad19a03",
+      "seconds": 20.326,
+      "surah": 99,
+      "ayah": 6,
+      "words": [
+        "يَوْمَئِذٍ",
+        "يَصْدُرُ",
+        "النَّاسُ",
+        "أَشْتَاتًا",
+        "لِّيُرَوْا",
+        "أَعْمَالَهُمْ"
+      ]
+    },
+    "learner-4628ef89-chunk1": {
+      "path": "temp_audio_chunks/chunks_recording_4628ef89-1038-4336-a147-dfc5e21544ec/chunk1.wav",
+      "sha256": "15f6419b12a1c654958c8d457807561950caf5ad243f9c8438ea02e1d160d5a7",
+      "seconds": 8.386,
+      "surah": 99,
+      "ayah": 7,
+      "words": [
+        "فَمَن",
+        "يَعْمَلْ",
+        "مِثْقَالَ",
+        "ذَرَّةٍ",
+        "خَيْرًا",
+        "يَرَهُ"
+      ]
+    },
+    "learner-4b6cf92d-chunk0": {
+      "path": "temp_audio_chunks/chunks_recording_4b6cf92d-1d84-40b6-b407-fcb76bc0be9f/chunk0.wav",
+      "sha256": "f72123c7c2033d26ffd69f474e5ff695771b6fb49455725fc26e09b7de3da7cd",
+      "seconds": 2.044,
+      "surah": 112,
+      "ayah": 1,
+      "words": [
+        "قُلْ",
+        "هُوَ",
+        "اللَّهُ",
+        "أَحَدٌ"
+      ]
+    },
+    "learner-583128bb-chunk0": {
+      "path": "temp_audio_chunks/chunks_recording_583128bb-4e0b-4ccd-8f75-c1812b0796f3/chunk0.wav",
+      "sha256": "61b6c1fef740e1710c9bdb9d87d7e67ec932a9900f3dd408df31125ae695d28e",
+      "seconds": 4.863,
+      "surah": 97,
+      "ayah": 1,
+      "words": [
+        "إِنَّا",
+        "أَنزَلْنَاهُ",
+        "فِي",
+        "لَيْلَةِ",
+        "الْقَدْرِ"
+      ]
+    },
+    "learner-583128bb-chunk1": {
+      "path": "temp_audio_chunks/chunks_recording_583128bb-4e0b-4ccd-8f75-c1812b0796f3/chunk1.wav",
+      "sha256": "26f636a92ffe30e624f87c3bf9c981be4158b42c54378d537a9b017b7cb0113d",
+      "seconds": 3.259,
+      "surah": 97,
+      "ayah": 2,
+      "words": [
+        "وَمَا",
+        "أَدْرَاكَ",
+        "مَا",
+        "لَيْلَةُ",
+        "الْقَدْرِ"
+      ]
+    },
+    "learner-7ca30ee3-chunk7": {
+      "path": "temp_audio_chunks/chunks_recording_7ca30ee3-0dff-49b5-9c40-15377a84951a/chunk7.wav",
+      "sha256": "bf6365d224217a9375983ccb1ac80daa308eb0bb90639250f143cb2102583f11",
+      "seconds": 3.309,
+      "surah": 102,
+      "ayah": 6,
+      "words": [
+        "لَتَرَوُنَّ",
+        "الْجَحِيمَ"
+      ]
+    },
+    "learner-7ca30ee3-chunk8": {
+      "path": "temp_audio_chunks/chunks_recording_7ca30ee3-0dff-49b5-9c40-15377a84951a/chunk8.wav",
+      "sha256": "9ac459ed71e9e80d23cc735d457742436e5aeceea6b2dbad940b3e51d28b1d63",
+      "seconds": 5.007,
+      "surah": 102,
+      "ayah": 7,
+      "words": [
+        "ثُمَّ",
+        "لَتَرَوُنَّهَا",
+        "عَيْنَ",
+        "الْيَقِينِ"
+      ]
+    },
+    "learner-7f47652b-chunk1": {
+      "path": "temp_audio_chunks/chunks_recording_7f47652b-9b50-43b0-9e79-b41ca07bc4f1/chunk1.wav",
+      "sha256": "f4ed0ea1697d2fad4a3c26c00e9e604f0d47c10bf36c1ac3eecf5ece2821b41d",
+      "seconds": 3.106,
+      "surah": 111,
+      "ayah": 3,
+      "words": [
+        "سَيَصْلَىٰ",
+        "نَارًا",
+        "ذَاتَ",
+        "لَهَبٍ"
+      ]
+    },
+    "learner-7f47652b-chunk2": {
+      "path": "temp_audio_chunks/chunks_recording_7f47652b-9b50-43b0-9e79-b41ca07bc4f1/chunk2.wav",
+      "sha256": "b1a773bfda8992d0d485410ec8ca14aa4d535cd2b4aa3e1f15acb082e0714314",
+      "seconds": 2.73,
+      "surah": 111,
+      "ayah": 4,
+      "words": [
+        "وَامْرَأَتُهُ",
+        "حَمَّالَةَ",
+        "الْحَطَبِ"
+      ]
+    },
+    "learner-7f47652b-chunk4": {
+      "path": "temp_audio_chunks/chunks_recording_7f47652b-9b50-43b0-9e79-b41ca07bc4f1/chunk4.wav",
+      "sha256": "43f9f413176d7f7d6ac7e9097b9ca07a42dbc8c7ae0c0f0c39e6c1c7a2ca409b",
+      "seconds": 3.899,
+      "surah": 111,
+      "ayah": 5,
+      "words": [
+        "فِي",
+        "جِيدِهَا",
+        "حَبْلٌ",
+        "مِّن",
+        "مَّسَدٍ"
+      ]
+    },
+    "learner-98c7a442-chunk0": {
+      "path": "temp_audio_chunks/chunks_recording_98c7a442-df2b-4a09-82af-03d53a252bc2/chunk0.wav",
+      "sha256": "8b28f23d39ee6376fdbdd76ab896c3eb2cacd1cd720dce6260c12af6eb8f5862",
+      "seconds": 2.93,
+      "surah": 104,
+      "ayah": 1,
+      "words": [
+        "وَيْلٌ",
+        "لِّكُلِّ",
+        "هُمَزَةٍ",
+        "لُّمَزَةٍ"
+      ]
+    },
+    "learner-98c7a442-chunk3": {
+      "path": "temp_audio_chunks/chunks_recording_98c7a442-df2b-4a09-82af-03d53a252bc2/chunk3.wav",
+      "sha256": "da37be6ffbde73998956562ab3a146890a94db27f6cba5b07be5bea630dea790",
+      "seconds": 3.066,
+      "surah": 104,
+      "ayah": 4,
+      "words": [
+        "كَلَّا",
+        "لَيُنبَذَنَّ",
+        "فِي",
+        "الْحُطَمَةِ"
+      ]
+    },
+    "learner-a270f049-chunk10": {
+      "path": "temp_audio_chunks/chunks_recording_a270f049-b7b6-492f-9548-cb5ccbafe092/chunk10.wav",
+      "sha256": "ae6578e117877508108d2967fdae46d4e287200006534aea0d6926812673e910",
+      "seconds": 3.716,
+      "surah": 100,
+      "ayah": 10,
+      "words": [
+        "وَحُصِّلَ",
+        "مَا",
+        "فِي",
+        "الصُّدُورِ"
+      ]
+    },
+    "learner-a270f049-chunk5": {
+      "path": "temp_audio_chunks/chunks_recording_a270f049-b7b6-492f-9548-cb5ccbafe092/chunk5.wav",
+      "sha256": "41a5cf8dc819d3398bfc23d0e32db0bace696ebbf9d6554755fb0e6705557ae1",
+      "seconds": 3.465,
+      "surah": 100,
+      "ayah": 5,
+      "words": [
+        "فَوَسَطْنَ",
+        "بِهِ",
+        "جَمْعًا"
+      ]
+    },
+    "learner-a270f049-chunk8": {
+      "path": "temp_audio_chunks/chunks_recording_a270f049-b7b6-492f-9548-cb5ccbafe092/chunk8.wav",
+      "sha256": "143577383d9e318d209b74054a60e00c2f23d7b75c4ee15bef939325a5238ee5",
+      "seconds": 5.663,
+      "surah": 100,
+      "ayah": 8,
+      "words": [
+        "وَإِنَّهُ",
+        "لِحُبِّ",
+        "الْخَيْرِ",
+        "لَشَدِيدٌ"
+      ]
+    },
+    "learner-b0859639-chunk0": {
+      "path": "temp_audio_chunks/chunks_recording_b0859639-7335-4434-ade0-7ab787eb9a9d/chunk0.wav",
+      "sha256": "cfb0d9f92c0669ab15e06b5a6da8c969bb40e2c7f57de5c3bf05cc56061b413b",
+      "seconds": 11.684,
+      "surah": 95,
+      "ayah": 4,
+      "words": [
+        "لَقَدْ",
+        "خَلَقْنَا",
+        "الْإِنسَانَ",
+        "فِي",
+        "أَحْسَنِ",
+        "تَقْوِيمٍ"
+      ]
+    },
+    "learner-bbcedf57-chunk5": {
+      "path": "temp_audio_chunks/chunks_recording_bbcedf57-fcc1-4d90-9bc9-1f039cdd73ca/chunk5.wav",
+      "sha256": "4d4b786cda728ef752c8a35b0760d7bd626967ae70e0c84ab926314a1e163a09",
+      "seconds": 3.101,
+      "surah": 93,
+      "ayah": 11,
+      "words": [
+        "وَأَمَّا",
+        "بِنِعْمَةِ",
+        "رَبِّكَ",
+        "فَحَدِّثْ"
+      ]
+    },
+    "learner-c239de42-chunk0": {
+      "path": "temp_audio_chunks/chunks_recording_c239de42-e82f-4bea-8ebd-034576b635fb/chunk0.wav",
+      "sha256": "76542b305d0289329a4cd450d42be40e9a466745ea0ae63f12c960c4f99db073",
+      "seconds": 19.37,
+      "surah": 105,
+      "ayah": 1,
+      "words": [
+        "أَلَمْ",
+        "تَرَ",
+        "كَيْفَ",
+        "فَعَلَ",
+        "رَبُّكَ",
+        "بِأَصْحَابِ",
+        "الْفِيلِ"
+      ]
+    },
+    "learner-c485e899-chunk1": {
+      "path": "temp_audio_chunks/chunks_recording_c485e899-373c-4c11-9ef1-842e4051eaaa/chunk1.wav",
+      "sha256": "e56a791a9e5243d994bb1bb1e38deea49ebad54f72ded3cf1cdd77eb39ab3f2a",
+      "seconds": 2.658,
+      "surah": 94,
+      "ayah": 3,
+      "words": [
+        "الَّذِي",
+        "أَنقَضَ",
+        "ظَهْرَكَ"
+      ]
+    },
+    "learner-c8bd67d3-chunk15": {
+      "path": "temp_audio_chunks/chunks_recording_c8bd67d3-a7b9-415e-ba4b-d910b79fb009/chunk15.wav",
+      "sha256": "c9ffd2577d059f3aa4c1d8a9163766a53635e54e317417b30f2c89ac6699db3a",
+      "seconds": 4.788,
+      "surah": 90,
+      "ayah": 19,
+      "words": [
+        "وَالَّذِينَ",
+        "كَفَرُوا",
+        "بِآيَاتِنَا",
+        "هُمْ",
+        "أَصْحَابُ",
+        "الْمَشْأَمَةِ"
+      ]
+    },
+    "learner-c8bd67d3-chunk7": {
+      "path": "temp_audio_chunks/chunks_recording_c8bd67d3-a7b9-415e-ba4b-d910b79fb009/chunk7.wav",
+      "sha256": "807229a8dd3e40130afdb85c93520f03bd401dcd5ab141b67b531b6495b43094",
+      "seconds": 3.369,
+      "surah": 90,
+      "ayah": 8,
+      "words": [
+        "أَلَمْ",
+        "نَجْعَل",
+        "لَّهُ",
+        "عَيْنَيْنِ"
+      ]
+    },
+    "learner-e5e672b2-chunk0": {
+      "path": "temp_audio_chunks/chunks_recording_e5e672b2-e0e2-41ee-8e8a-24e38bf675ba/chunk0.wav",
+      "sha256": "25cc573b4dbcdfc997b869740d5a8b6c5032a260d349ee8789b055b118ae9ba2",
+      "seconds": 3.081,
+      "surah": 96,
+      "ayah": 1,
+      "words": [
+        "اقْرَأْ",
+        "بِاسْمِ",
+        "رَبِّكَ",
+        "الَّذِي",
+        "خَلَقَ"
+      ]
+    },
+    "learner-e5e672b2-chunk2": {
+      "path": "temp_audio_chunks/chunks_recording_e5e672b2-e0e2-41ee-8e8a-24e38bf675ba/chunk2.wav",
+      "sha256": "5f84b3dc7b5e5605aeb5b0ecce8301bdf18026cd53927b98210e82b0a5ff6c5d",
+      "seconds": 29.968,
+      "surah": 96,
+      "ayah": 14,
+      "words": [
+        "أَلَمْ",
+        "يَعْلَم",
+        "بِأَنَّ",
+        "اللَّهَ",
+        "يَرَىٰ"
+      ]
+    },
+    "learner-e5e672b2-chunk3": {
+      "path": "temp_audio_chunks/chunks_recording_e5e672b2-e0e2-41ee-8e8a-24e38bf675ba/chunk3.wav",
+      "sha256": "0177157ff43f7c46ffda34ff20be7c6eb269aa5d5edd86005610df68fcc46702",
+      "seconds": 3.173,
+      "surah": 96,
+      "ayah": 16,
+      "words": [
+        "نَاصِيَةٍ",
+        "كَاذِبَةٍ",
+        "خَاطِئَةٍ"
+      ]
+    },
+    "learner-e676c7c1-chunk7": {
+      "path": "temp_audio_chunks/chunks_recording_e676c7c1-d0dd-4aed-bd42-0d1768b51d2d/chunk7.wav",
+      "sha256": "ae1cc8952c9d4812306bc81b3d02887d43b41c1c99544617dab2c8f1bb242d41",
+      "seconds": 12.64,
+      "surah": 92,
+      "ayah": 15,
+      "words": [
+        "لَا",
+        "يَصْلَاهَا",
+        "إِلَّا",
+        "الْأَشْقَى"
+      ]
+    },
+    "learner-fc464f57-chunk1": {
+      "path": "temp_audio_chunks/chunks_recording_fc464f57-301f-4c74-ad78-2e7512ff6d10/chunk1.wav",
+      "sha256": "fc25a7eaabd79880d72f573e271bca0000b1911a961eae14e181232bd88d2dc3",
+      "seconds": 13.259,
+      "surah": 98,
+      "ayah": 5,
+      "words": [
+        "وَمَا",
+        "أُمِرُوا",
+        "إِلَّا",
+        "لِيَعْبُدُوا",
+        "اللَّهَ",
+        "مُخْلِصِينَ",
+        "لَهُ",
+        "الدِّينَ",
+        "حُنَفَاءَ",
+        "وَيُقِيمُوا",
+        "الصَّلَاةَ",
+        "وَيُؤْتُوا",
+        "الزَّكَاةَ",
+        "وَذَٰلِكَ",
+        "دِينُ",
+        "الْقَيِّمَةِ"
+      ]
+    },
+    "learner-fc464f57-chunk2": {
+      "path": "temp_audio_chunks/chunks_recording_fc464f57-301f-4c74-ad78-2e7512ff6d10/chunk2.wav",
+      "sha256": "fb1517195de8a1247b1560fdb167a011c6cf67f3da26bb4130367d09bbbfbffb",
+      "seconds": 6.483,
+      "surah": 98,
+      "ayah": 6,
+      "words": [
+        "إِنَّ",
+        "الَّذِينَ",
+        "كَفَرُوا",
+        "مِنْ",
+        "أَهْلِ",
+        "الْكِتَابِ",
+        "وَالْمُشْرِكِينَ",
+        "فِي",
+        "نَارِ",
+        "جَهَنَّمَ",
+        "خَالِدِينَ",
+        "فِيهَا",
+        "أُولَٰئِكَ",
+        "هُمْ",
+        "شَرُّ",
+        "الْبَرِيَّةِ"
+      ]
+    },
+    "learner-fc464f57-chunk3": {
+      "path": "temp_audio_chunks/chunks_recording_fc464f57-301f-4c74-ad78-2e7512ff6d10/chunk3.wav",
+      "sha256": "ed7016f92ba838837972fdc1c3a12588697a6877cfa91cbaa07b548bd941db85",
+      "seconds": 7.362,
+      "surah": 98,
+      "ayah": 6,
+      "words": [
+        "إِنَّ",
+        "الَّذِينَ",
+        "كَفَرُوا",
+        "مِنْ",
+        "أَهْلِ",
+        "الْكِتَابِ",
+        "وَالْمُشْرِكِينَ",
+        "فِي",
+        "نَارِ",
+        "جَهَنَّمَ",
+        "خَالِدِينَ",
+        "فِيهَا",
+        "أُولَٰئِكَ",
+        "هُمْ",
+        "شَرُّ",
+        "الْبَرِيَّةِ"
+      ]
+    },
+    "learner-fc464f57-chunk5": {
+      "path": "temp_audio_chunks/chunks_recording_fc464f57-301f-4c74-ad78-2e7512ff6d10/chunk5.wav",
+      "sha256": "246a4a69d6e9eeaefda618410f12f08b6ded1f5e4041622af3755908ea7f7dc3",
+      "seconds": 7.108,
+      "surah": 98,
+      "ayah": 8,
+      "words": [
+        "جَزَاؤُهُمْ",
+        "عِندَ",
+        "رَبِّهِمْ",
+        "جَنَّاتُ",
+        "عَدْنٍ",
+        "تَجْرِي",
+        "مِن",
+        "تَحْتِهَا",
+        "الْأَنْهَارُ",
+        "خَالِدِينَ",
+        "فِيهَا",
+        "أَبَدًا",
+        "رَّضِيَ",
+        "اللَّهُ",
+        "عَنْهُمْ",
+        "وَرَضُوا",
+        "عَنْهُ",
+        "ذَٰلِكَ",
+        "لِمَنْ",
+        "خَشِيَ",
+        "رَبَّهُ"
+      ]
+    },
+    "learner-fc464f57-chunk6": {
+      "path": "temp_audio_chunks/chunks_recording_fc464f57-301f-4c74-ad78-2e7512ff6d10/chunk6.wav",
+      "sha256": "9850afdd0ff39385d4dae9fd3c5666e969dccde30fc3a3de48427510c92cec26",
+      "seconds": 7.069,
+      "surah": 98,
+      "ayah": 8,
+      "words": [
+        "جَزَاؤُهُمْ",
+        "عِندَ",
+        "رَبِّهِمْ",
+        "جَنَّاتُ",
+        "عَدْنٍ",
+        "تَجْرِي",
+        "مِن",
+        "تَحْتِهَا",
+        "الْأَنْهَارُ",
+        "خَالِدِينَ",
+        "فِيهَا",
+        "أَبَدًا",
+        "رَّضِيَ",
+        "اللَّهُ",
+        "عَنْهُمْ",
+        "وَرَضُوا",
+        "عَنْهُ",
+        "ذَٰلِكَ",
+        "لِمَنْ",
+        "خَشِيَ",
+        "رَبَّهُ"
+      ]
+    },
+    "learner-fc464f57-chunk7": {
+      "path": "temp_audio_chunks/chunks_recording_fc464f57-301f-4c74-ad78-2e7512ff6d10/chunk7.wav",
+      "sha256": "1c5abbbc78a184e227beb78a93714a5ef4d12e0e38744ae97c4152cb7b3e297c",
+      "seconds": 2.39,
+      "surah": 98,
+      "ayah": 8,
+      "words": [
+        "جَزَاؤُهُمْ",
+        "عِندَ",
+        "رَبِّهِمْ",
+        "جَنَّاتُ",
+        "عَدْنٍ",
+        "تَجْرِي",
+        "مِن",
+        "تَحْتِهَا",
+        "الْأَنْهَارُ",
+        "خَالِدِينَ",
+        "فِيهَا",
+        "أَبَدًا",
+        "رَّضِيَ",
+        "اللَّهُ",
+        "عَنْهُمْ",
+        "وَرَضُوا",
+        "عَنْهُ",
+        "ذَٰلِكَ",
+        "لِمَنْ",
+        "خَشِيَ",
+        "رَبَّهُ"
+      ]
+    }
+  },
+  "tasks": [
+    {
+      "id": "R01",
+      "clip": "learner-7f47652b-chunk2",
+      "word_index": 1
+    },
+    {
+      "id": "R02",
+      "clip": "learner-11c75fcb-chunk3",
+      "word_index": 2
+    },
+    {
+      "id": "R03",
+      "clip": "learner-7ca30ee3-chunk7",
+      "word_index": 0
+    },
+    {
+      "id": "R04",
+      "clip": "learner-2c3c83de-chunk4",
+      "word_index": 1
+    },
+    {
+      "id": "R05",
+      "clip": "learner-4628ef89-chunk1",
+      "word_index": 2
+    },
+    {
+      "id": "R06",
+      "clip": "learner-c8bd67d3-chunk7",
+      "word_index": 2
+    },
+    {
+      "id": "R07",
+      "clip": "learner-fc464f57-chunk1",
+      "word_index": 9
+    },
+    {
+      "id": "R08",
+      "clip": "learner-fc464f57-chunk5",
+      "word_index": 9
+    },
+    {
+      "id": "R09",
+      "clip": "learner-c239de42-chunk0",
+      "word_index": 5
+    },
+    {
+      "id": "R10",
+      "clip": "learner-fc464f57-chunk6",
+      "word_index": 9
+    },
+    {
+      "id": "R11",
+      "clip": "learner-fc464f57-chunk7",
+      "word_index": 9
+    },
+    {
+      "id": "R12",
+      "clip": "learner-583128bb-chunk0",
+      "word_index": 4
+    },
+    {
+      "id": "R13",
+      "clip": "learner-a270f049-chunk8",
+      "word_index": 1
+    },
+    {
+      "id": "R14",
+      "clip": "learner-a270f049-chunk10",
+      "word_index": 0
+    },
+    {
+      "id": "R15",
+      "clip": "learner-7f47652b-chunk4",
+      "word_index": 2
+    },
+    {
+      "id": "R16",
+      "clip": "learner-bbcedf57-chunk5",
+      "word_index": 3
+    },
+    {
+      "id": "R17",
+      "clip": "learner-0c0463c9-chunk3",
+      "word_index": 3
+    },
+    {
+      "id": "R18",
+      "clip": "learner-fc464f57-chunk3",
+      "word_index": 14
+    },
+    {
+      "id": "R19",
+      "clip": "learner-e676c7c1-chunk7",
+      "word_index": 1
+    },
+    {
+      "id": "R20",
+      "clip": "learner-2c3c83de-chunk2",
+      "word_index": 1
+    },
+    {
+      "id": "R21",
+      "clip": "learner-a270f049-chunk5",
+      "word_index": 2
+    },
+    {
+      "id": "R22",
+      "clip": "learner-7ca30ee3-chunk8",
+      "word_index": 1
+    },
+    {
+      "id": "R23",
+      "clip": "learner-fc464f57-chunk7",
+      "word_index": 8
+    },
+    {
+      "id": "R24",
+      "clip": "learner-34fd8b43-chunk1",
+      "word_index": 1
+    },
+    {
+      "id": "R25",
+      "clip": "learner-fc464f57-chunk6",
+      "word_index": 8
+    },
+    {
+      "id": "R26",
+      "clip": "learner-e5e672b2-chunk2",
+      "word_index": 3
+    },
+    {
+      "id": "R27",
+      "clip": "learner-b0859639-chunk0",
+      "word_index": 5
+    },
+    {
+      "id": "R28",
+      "clip": "learner-e5e672b2-chunk3",
+      "word_index": 0
+    },
+    {
+      "id": "R29",
+      "clip": "learner-4b6cf92d-chunk0",
+      "word_index": 1
+    },
+    {
+      "id": "R30",
+      "clip": "learner-7f47652b-chunk1",
+      "word_index": 0
+    },
+    {
+      "id": "R31",
+      "clip": "learner-4628ef89-chunk0",
+      "word_index": 1
+    },
+    {
+      "id": "R32",
+      "clip": "learner-98c7a442-chunk3",
+      "word_index": 2
+    },
+    {
+      "id": "R33",
+      "clip": "learner-98c7a442-chunk0",
+      "word_index": 3
+    },
+    {
+      "id": "R34",
+      "clip": "learner-c8bd67d3-chunk15",
+      "word_index": 4
+    },
+    {
+      "id": "R35",
+      "clip": "learner-e5e672b2-chunk0",
+      "word_index": 0
+    },
+    {
+      "id": "R36",
+      "clip": "learner-fc464f57-chunk5",
+      "word_index": 8
+    },
+    {
+      "id": "R37",
+      "clip": "learner-583128bb-chunk1",
+      "word_index": 4
+    },
+    {
+      "id": "R38",
+      "clip": "learner-18811651-chunk1",
+      "word_index": 1
+    },
+    {
+      "id": "R39",
+      "clip": "learner-fc464f57-chunk2",
+      "word_index": 14
+    },
+    {
+      "id": "R40",
+      "clip": "learner-2c3c83de-chunk6",
+      "word_index": 1
+    },
+    {
+      "id": "R41",
+      "clip": "learner-2c3c83de-chunk1",
+      "word_index": 2
+    },
+    {
+      "id": "R42",
+      "clip": "learner-3071edd1-chunk1",
+      "word_index": 2
+    },
+    {
+      "id": "R43",
+      "clip": "learner-c485e899-chunk1",
+      "word_index": 2
+    }
+  ]
+}

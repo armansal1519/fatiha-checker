@@ -4,11 +4,12 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <meta name="theme-color" content="#193f36">
-  <title>هم‌خوان | تمرین سورهٔ حمد</title>
+  <title>هم‌خوان | بررسی دقیق آیات قرآن</title>
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'%3E%3Crect width='40' height='40' rx='12' fill='%23193f36'/%3E%3Ctext x='20' y='28' text-anchor='middle' font-size='28' fill='%23e4c98d'%3Eح%3C/text%3E%3C/svg%3E">
   <link rel="preload" href="{{ url_for('static', filename='fonts/Vazirmatn-Variable.woff2') }}" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="{{ url_for('static', filename='fonts/Amiri-Regular.ttf') }}" as="font" type="font/ttf" crossorigin>
   <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='live.css') }}">
   <script id="verse-data" type="application/json">{{ verses | tojson }}</script>
   <script src="{{ url_for('static', filename='app.js') }}" defer></script>
 </head>
@@ -26,17 +27,15 @@
       <p>بخوانید، به صدایتان گوش کنید و اختلاف‌های احتمالیِ حروف و حرکات را ببینید.</p>
     </section>
     <div class="workspace">
-      <aside class="surah-panel" aria-label="انتخاب آیه">
-        <div class="surah-heading"><div><span class="small-label">سورهٔ ۱</span><h2>الفاتحة</h2></div><span class="surah-seal" aria-hidden="true">۷</span></div>
-        <div class="surah-meta">سورهٔ حمد <span>۷ آیه · روایت حفص</span></div>
-        <nav id="verse-nav">
-          {% for verse in verses %}
-          <button class="verse-button {{ 'selected' if loop.first else '' }}" data-ayah="{{ verse.ayah }}" aria-current="{{ 'true' if loop.first else 'false' }}">
-            <span class="verse-number">{{ '۰۱۲۳۴۵۶۷۸۹'[verse.ayah] }}</span><span class="verse-preview" lang="ar">{{ verse.text }}</span><span class="verse-arrow" aria-hidden="true">‹</span>
-          </button>
-          {% endfor %}
-        </nav>
-        <p class="aside-note"><span aria-hidden="true">✧</span> هر بار، فقط آیهٔ انتخاب‌شده را بخوانید و در پایان آن توقف کنید.</p>
+      <aside class="surah-panel" aria-label="انتخاب سوره و آیه">
+        <div class="surah-heading"><div><span class="small-label" id="precise-surah-number">سورهٔ ۱</span><h2 id="precise-surah-name">الفاتحة</h2></div><span class="surah-seal" id="precise-ayah-count" aria-hidden="true">۷</span></div>
+        <div class="precise-picker">
+          <label for="precise-surah">سوره</label><select id="precise-surah"><option value="1">الفاتحة</option></select>
+          <label for="precise-ayah">آیه</label><select id="precise-ayah">{% for verse in verses %}<option value="{{ verse.ayah }}">{{ verse.ayah }}</option>{% endfor %}</select>
+        </div>
+        <p id="precise-catalogue-status" class="aside-note" role="status"></p>
+        <nav id="verse-nav" aria-label="آیات نزدیک به انتخاب شما"></nav>
+        <p class="aside-note">در این حالت، یک قطعهٔ حداکثر ۳۰ ثانیه‌ای بررسی می‌شود. برای آیات بلندتر از قرائت زنده استفاده کنید.</p>
       </aside>
       <section class="practice-panel" aria-label="تمرین قرائت">
         <div class="reading-card">
@@ -44,7 +43,7 @@
           <div class="verse-ornament" aria-hidden="true">✧</div>
           <div id="verse-text" class="arabic-verse" lang="ar" tabindex="-1">{{ verses[0].text }}</div>
           <p class="reading-hint">با صدای طبیعی و در محیطی آرام بخوانید.</p>
-          <div id="progress-dots" class="progress-dots" aria-hidden="true">{% for verse in verses %}<span class="{{ 'active' if loop.first else '' }}"></span>{% endfor %}</div>
+          <div id="progress-dots" class="progress-dots" aria-hidden="true"></div>
         </div>
         <div class="recording-card">
           <div class="section-top"><h2>نوبتِ خواندن شماست</h2><span>حداکثر ۳۰ ثانیه</span></div>
