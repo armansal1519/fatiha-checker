@@ -15,6 +15,7 @@ let sessionReplay = null, replayURL = null, chosenFile = null, selectedWord = nu
 let manualScrollIntent = 0, manualUntil = 0, autoScrollUntil = 0, raf = null, lastCanvasFrame = 0, lastSummary = null;
 let surahs = [], catalogueReady = false, referenceFetch = 0, lastAnnouncedCount = 0;
 let hasDisplayLocation = false;
+let previewSelection = '';
 let audioActivity = null, inputWarning = '', lowInputSince = null, lastInputPaint = -Infinity, lastStreamStatus = '';
 const wordNodes = new Map(), gapNodes = new Map();
 let renderedOrder = [], renderedCommitted = 0, keyboardNode = null, lastReviewNode=null;
@@ -72,6 +73,10 @@ function referenceControls() {
 function setPhase(next) {
   if (measureUI) { const changed = performance.now(), run = generation; requestAnimationFrame(()=>{ if (run === generation) controlPaints.push(performance.now()-changed); }); }
   phase = next; document.body.dataset.phase = next;
+  if (next === 'idle') {
+    previewSelection = null;
+    void previewSelectedAyah();
+  }
   const locked = ['connecting','recording','file','stopping'].includes(next);
   $('live-start').disabled = !ready || locked;
   $('check-ready').hidden = locked || (ready && next!=='error');
@@ -601,13 +606,35 @@ async function finish(remoteDone = false) {
     status(transcript.tokens.length ? 'تمرین پایان یافت. متن شنیده‌شده و کلمه‌های مشخص‌شده را مرور کنید.' : 'گفتار کافی برای رونویسی پیدا نشد؛ دوباره بخوانید.');
   } catch (problem) { if (run === generation) fail(problem.message); }
 }
+async function previewSelectedAyah() {
+  const surah = Number($('start-surah').value), ayah = Number($('start-ayah').value);
+  const selected = catalogueReady && !$('reference-auto').checked && surah && ayah;
+  const key = selected ? `${surah}:${ayah}` : '';
+  if (phase !== 'idle' || key === previewSelection) return;
+  previewSelection = key;
+  const verse = $('selected-ayah-text');
+  verse.hidden = !selected;
+  $('empty-title').textContent = selected ? `شروع از ${locationLabel({surah, ayah})}` : 'هنوز واژه‌ای شنیده نشده';
+  $('transcript-location').textContent = selected ? 'محل شروع به‌صورت دستی انتخاب شده است' : 'محل قرائت هنوز مشخص نشده است';
+  verse.textContent = selected ? '…' : '';
+  if (!selected) return;
+  try {
+    const response = await fetch(`/api/quran/ayahs?surah=${surah}&start=${ayah}&limit=1`);
+    if (!response.ok) throw new Error();
+    const {ayahs} = await response.json();
+    if (!ayahs?.[0]?.text) throw new Error();
+    if (key === previewSelection) verse.textContent = ayahs[0].text;
+  } catch {
+    if (key === previewSelection) verse.textContent = 'متن آیه دریافت نشد.';
+  }
+}
 function fillAyahs(value = 1) {
   const surah = surahs.find(item=>item.surah === Number($('start-surah').value));
   $('start-ayah').replaceChildren();
   for (let number = 1; number <= (surah?.ayah_count || 1); number++) {
     const option = document.createElement('option'); option.value = String(number); option.textContent = fa(number); $('start-ayah').append(option);
   }
-  $('start-ayah').value = String(value <= (surah?.ayah_count || 1) ? value : 1); referenceControls();
+  $('start-ayah').value = String(value <= (surah?.ayah_count || 1) ? value : 1); referenceControls(); void previewSelectedAyah();
 }
 async function loadCatalogue() {
   try {
@@ -622,7 +649,9 @@ $('live-start').addEventListener('click',()=>void begin());
 $('live-stop').addEventListener('click',()=>void finish()); $('live-stop-mobile').addEventListener('click',()=>void finish());
 $('live-reset').addEventListener('click',()=>reset());
 $('reference-auto').addEventListener('change',()=>{ $('location-next').hidden = true; referenceControls(); if (active() && $('reference-auto').checked && manualReferenceApplied) { $('reference-auto').checked=false; referenceControls(); status('مرجع دستی این نوبت فعال است. برای تشخیص خودکار نوبت تازه‌ای آغاز کنید.'); } });
+$('reference-auto').addEventListener('change',previewSelectedAyah);
 $('start-surah').addEventListener('change',()=>fillAyahs());
+$('start-ayah').addEventListener('change',previewSelectedAyah);
 function applyManualReference() {
   if (active()) { try { connection.setReference(Number($('start-surah').value),Number($('start-ayah').value)); manualReferenceApplied=true; status('محل انتخاب‌شده برای مقایسه اعمال شد؛ نوشتهٔ صدای شما حفظ می‌شود.'); } catch (problem) { error(problem.message); } }
   else {

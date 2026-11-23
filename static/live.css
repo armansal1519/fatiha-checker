@@ -173,6 +173,7 @@ body[data-phase=error] .live-pill:before{background:#d6a386}
 .transcript-empty svg{width:48px;height:48px;color:#7f9269;margin-bottom:14px}
 .transcript-empty h3{font-size:17px;line-height:1.8;font-weight:500;margin:0 0 9px;color:#37553e}
 .transcript-empty p{font-size:12px;line-height:2.1;margin:0;max-width:47ch;color:#586a52}
+#selected-ayah-text{font:clamp(25px,4vw,32px)/2 Amiri,serif;color:#37513b;margin:0 0 16px;overflow-wrap:anywhere}
 .transcript-empty:not([hidden])+.heard-transcript{min-height:0;padding:0}
 .reference-panel{margin-top:15px}
 .reference-panel>summary span{color:#596e50;font-weight:400;font-size:11px}
